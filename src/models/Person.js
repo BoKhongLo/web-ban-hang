@@ -1,6 +1,6 @@
 import mongoose, { Schema, ObjectId } from "mongoose";
-import isEmail from "validator/lib/isemail";
-export default mongoose.model(
+import pkg from 'validator';
+const { isEmail } = pkg;export default mongoose.model(
     "Person",
     new Schema({
         id: { type: ObjectId },
@@ -8,14 +8,14 @@ export default mongoose.model(
             type: String,
             required: true,
             validate: {
-                validataor: (value) => value.length > 3,
+                validator: (value) => value.length > 3,
                 message: "username must be at least 3 characters",
             },
         },
         email: {
             type: String,
             validate: {
-                validataor: (value) => isEmail(value),
+                validator: (value) => isEmail,
                 message: "email is incorrect format",
             },
         },
