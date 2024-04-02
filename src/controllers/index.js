@@ -1,7 +1,8 @@
 import userController from './users.js'
-
+import authController from './auth.js';
 
 const AppController = {
-    userController
+    userController,
+    authController
 }
 export default AppController;
