@@ -6,7 +6,7 @@ export default mongoose.model(
             type: String,
             required: true,
         },
-        userID: {
+        userId: {
             type: String,
             ref: "Person",
             required: true,

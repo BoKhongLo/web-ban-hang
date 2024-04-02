@@ -2,12 +2,16 @@ import mongoose, { Schema, ObjectId } from "mongoose";
 export default mongoose.model(
     "Products",
     new Schema({
-        id: { type: ObjectId },
+        id: {
+             type: String,
+             require: true,
+             unique:true,
+        },
         name: {
             type: String,
             required: true,
             validate: {
-                validator: (value) => {
+                validator: (value : string) => {
                     // Define the validator function
                     return typeof value === "string" && value.trim().length > 0;
                 },
@@ -57,7 +61,7 @@ export default mongoose.model(
         },
         ofSellers: {
             userId: {
-                type: Schema.Types.ObjectId,
+                type: String,
                 required: true,
                 ref: "User",
             },
@@ -93,8 +97,12 @@ export default mongoose.model(
             default: 0,
         },
         comment: [
-                {
-                    UserId: {
+                {   
+                    id: {
+                        type: String,
+                        required: true
+                    },
+                    userId: {
                         type: String,
                     },
                     isDisplay: {
@@ -105,6 +113,9 @@ export default mongoose.model(
                     },
                     content: {
                         type: String,
+                    },
+                    urlFile: {
+                        type: [String],
                     },
                     star: {
                         type: Number,
