@@ -23,6 +23,11 @@ export async function loginService(dto: LoginDto) {
 
 export async function signInService(dto: SignInDto) {
     try {
+
+        const userCheck = await UserModel.findOne({ email: dto.email });
+        if (userCheck) {
+            return { data : {error: "User is exist!"}, status: 401 };
+        }
         const user = new UserModel();
         user.id = uuidv5(dto.email, uuidv5.URL)
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
