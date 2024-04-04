@@ -23,7 +23,6 @@ export async function loginService(dto: LoginDto) {
 
 export async function signInService(dto: SignInDto) {
     try {
-
         const userCheck = await UserModel.findOne({ email: dto.email });
         if (userCheck) {
             return { data : {error: "User is exist!"}, status: 401 };
@@ -40,7 +39,7 @@ export async function signInService(dto: SignInDto) {
         user.username = dto.username;
         user.phoneNumber = new Types.Array<string>();
         user.phoneNumber.push(dto.phoneNumber)
-        user.gender = dto.gender ? dto.gender : "OTHER";
+        user.gender = dto.gender  ? dto.gender : "OTHER";
         user.firstName = dto.firstName;
         user.lastName = dto.lastName;
         user.address = dto.address ? dto.address : "NONE";

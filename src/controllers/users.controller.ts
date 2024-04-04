@@ -16,7 +16,6 @@ const getOrderHistory = async (req : Request, res : Response) => {
 
 };
 
-
 export {
     getUserDetails,
     updateUserDetails,
