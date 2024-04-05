@@ -1,15 +1,14 @@
-import mongoose, { Schema, ObjectId, Types, Date, Model } from "mongoose";
+import mongoose, { Schema, Types, Date, Model } from "mongoose";
 interface IImage {
   imageUrl: String;
 }
-
 interface IComment {
   id: string;
   userId: string;
   isDisplay: boolean;
   title: string;
   content: string;
-  urlFile: string[];
+  urlFile: IImage[];
   star: number;
   updateAt: Date;
   createdAt: Date;
@@ -108,7 +107,7 @@ const productSchema = new Schema<IProduct>({
           required: true,
         },
         content: { type: String, required: true },
-        urlFile: { type: [String], required: true },
+        urlFile: { type: [{ imageUrl: [String] }], required: true },
         star: { type: Number, required: true },
         updateAt: {
           type: Date,
@@ -126,4 +125,4 @@ const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
   "Product",
   productSchema
 );
-export { ProducModel };
+export { ProducModel, IProduct };
