@@ -11,7 +11,6 @@ const signInController = async (req: Request, res: Response)=> {
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-
     const dto = new SignInDto();
     dto.email = req.body.email;
     dto.password = req.body.password;
@@ -21,6 +20,7 @@ const signInController = async (req: Request, res: Response)=> {
     dto.username = req.body.username;
     dto.address = req.body.address;
     dto.gender = req.body.gender;
+
     validate(dto).then(errors => {
         if (errors.length > 0) {
             res.status(500).json({ errors: errors },);
@@ -47,12 +47,6 @@ const loginController = async (req: Request, res: Response) => {
     const returnData = await loginService(dto)
     return res.status(returnData.status).json(returnData.data)
 };
-
-// const logout = async (req, res) => {
-//     req.logout();
-//     res.redirect("/");
-//     res.send("Logout");
-// };
 
 // const deleteAccount = async (req : Request, res : Response) => {
 //     const user = req.user;
@@ -148,7 +142,6 @@ const loginController = async (req: Request, res: Response) => {
 //     }
 //     // Xác thực mật khẩu hiện tại (sử dụng bcrypt.compare)
 //     // ...
-
 //     // Cập nhật mật khẩu mới (sử dụng bcrypt.hash)
 //     // ...
 //     await user.save();

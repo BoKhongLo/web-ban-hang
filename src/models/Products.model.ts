@@ -1,134 +1,128 @@
-import mongoose, { Schema, ObjectId } from "mongoose";
-export default mongoose.model(
-    "Products",
-    new Schema({
+import mongoose, { Schema, Types, Date, Model } from "mongoose";
+interface IImage {
+  imageUrl: String;
+}
+interface IComment {
+  id: string;
+  userId: string;
+  isDisplay: boolean;
+  title: string;
+  content: string;
+  urlFile: IImage[];
+  star: number;
+  updateAt: Date;
+  createdAt: Date;
+}
+interface IProduct {
+  id: string;
+  productName: string;
+  isDisplay: boolean;
+  description?: string;
+  price: number;
+  stockQuantity: number;
+  img: Types.Array<IImage>;
+  productType: string;
+  pattern: string[];
+  buyCount?: number;
+  rating?: number;
+  commentsList: Types.DocumentArray<IComment>;
+  detail: string;
+  isSale: boolean;
+}
+
+const productSchema = new Schema<IProduct>({
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  productName: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (value: string) => value.length > 3,
+      message: "username must be at least 3 characters",
+    },
+  },
+  isDisplay: {
+    type: Boolean,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: false,
+    default: "Một sản phẩm từ....",
+  },
+  price: { type: Number, required: true },
+  stockQuantity: { type: Number, required: true },
+  productType: {
+    type: String,
+    main: String,
+    sub: String,
+    required: true,
+  },
+  pattern: {
+    type: [String],
+    required: false,
+  },
+  buyCount: {
+    type: Number,
+    require: false,
+  },
+  rating: {
+    type: Number,
+    require: false,
+  },
+  detail: {
+    type: String,
+    required: true,
+    tags: { type: [String], required: false },
+    labels: { type: String, required: false, default: "Shiro" },
+    materials: { type: [String], required: true },
+  },
+  isSale: {
+    type: Boolean,
+    default: false,
+    percent: {
+      type: Number,
+      default: 0,
+    },
+    end: {
+      type: Date,
+    },
+  },
+  commentsList: {
+    type: [
+      {
         id: {
-             type: String,
-             require: true,
-             unique:true,
+          type: String,
+          required: true,
         },
-        name: {
-            type: String,
-            required: true,
-            validate: {
-                validator: (value : string) => {
-                    // Define the validator function
-                    return typeof value === "string" && value.trim().length > 0;
-                },
-                message: "product's name must be at least 3 characters",
-            },
-        },                    
-        isDisplay: {
-            type: Boolean,
-            required: true,
+        userID: {
+          type: String,
+          required: true,
         },
-        description: {
-            type: String,
-            required: false,
-            default: "Một sản phẩm từ....",
+        title: {
+          type: String,
+          required: true,
         },
-        price: { type: Number, required: true },
-        stockQuantity: { type: Number, required: true },
-        img: { type: [String], required: true },
-        size: {
-            type: [String],
-            required: true,
+        content: { type: String, required: true },
+        urlFile: { type: [{ imageUrl: [String] }], required: true },
+        star: { type: Number, required: true },
+        updateAt: {
+          type: Date,
+          default: Date.now,
         },
-        productType: {
-            main: String,
-            sub: String,
+        createdAt: {
+          type: Date,
+          default: Date.now,
         },
-        pattern: {
-            type: [String],
-            required: false,
-        },
-        tags: {
-            type: [String],
-            required: false,
-        },
-        isSale: {
-            status: {
-                type: Boolean,
-                default: false,
-            },
-            percent: {
-                type: Number,
-                default: 0,
-            },
-            end: {
-                type: Date,
-            },
-        },
-        ofSellers: {
-            userId: {
-                type: String,
-                required: true,
-                ref: "User",
-            },
-            name: String,
-        },
-        labels: {
-            type: String,
-            required: false,
-            default: "Shiro",
-        },
-        materials: {
-            type: [String],
-            required: true,
-        },
-        buyCounts: {
-            type: Number,
-            required: false,
-            default: 0,
-        },
-        viewCounts: {
-            type: Number,
-            required: false,
-            default: 0,
-        },
-        rating: {
-            byUser: String,
-            content: String,
-            star: Number,
-        },
-        index: {
-            type: Number,
-            required: false,
-            default: 0,
-        },
-        comment: [
-                {   
-                    id: {
-                        type: String,
-                        required: true
-                    },
-                    userId: {
-                        type: String,
-                    },
-                    isDisplay: {
-                        type: Boolean,
-                    },
-                    title: {
-                        type: String,
-                    },
-                    content: {
-                        type: String,
-                    },
-                    urlFile: {
-                        type: [String],
-                    },
-                    star: {
-                        type: Number,
-                    },
-                    Update_At: {
-                        type: Date,
-                        default: Date.now,
-                    },
-                    Created_At: {
-                        type: Date,
-                        default: Date.now,
-                    },
-                },
-            ],
-    })
+      },
+    ],
+  },
+});
+const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
+  "Product",
+  productSchema
 );
+export { ProducModel, IProduct };
