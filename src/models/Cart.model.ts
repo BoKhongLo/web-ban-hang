@@ -1,5 +1,7 @@
 import mongoose, { Schema, Types, Model } from "mongoose";
 import { IDeliveryInfo, DeliveryInfoModel } from './Users.model';
+import passportLocalMongoose from "passport-local-mongoose";
+
 
 interface ICartItem {
   productId: string;
@@ -71,6 +73,8 @@ const cartSchema = new Schema<ICart>({
     default: Date.now,
   },
 })
+cartSchema.plugin(passportLocalMongoose)
+
 
 const CartModel : Model<ICart> = mongoose.model<ICart>('Cart', cartSchema);
 

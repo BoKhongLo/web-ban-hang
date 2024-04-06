@@ -1,10 +1,18 @@
 import mongoose, { Schema, Model, Types } from "mongoose";
 import { CartModel, ICart } from "./Cart.model";
+import passportLocalMongoose from "passport-local-mongoose";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 interface IDeliveryInfo {
     name: string;
     phoneNumber: string;
     address: string;
+}
+
+export interface AuthToken {
+    accessToken: string;
+    kind: string;
 }
 
 const DeliveryInfo = new Schema<IDeliveryInfo>({
@@ -24,7 +32,7 @@ const DeliveryInfo = new Schema<IDeliveryInfo>({
 
 interface IUser {
     id: string,
-     
+
     isDisplay: boolean,
 
     username: string,
@@ -58,15 +66,19 @@ interface IUser {
     updateAt: Date,
 
     createdAt: Date
+    
 }
+
+DeliveryInfo.plugin(passportLocalMongoose)
+
 const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>('DeliveryInfo', DeliveryInfo);
 
 const userSchema = new Schema<IUser>({
-    id: { 
+    id: {
         type: String,
         required: true,
-        unique:true,
-    },        
+        unique: true,
+    },
     isDisplay: {
         type: Boolean,
         required: true,
@@ -75,7 +87,7 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true,
         validate: {
-            validator: (value : string) => value.length > 3,
+            validator: (value: string) => value.length > 3,
             message: "username must be at least 3 characters",
         },
     },
@@ -98,7 +110,7 @@ const userSchema = new Schema<IUser>({
     email: {
         type: String,
         required: true,
-        unique:true,
+        unique: true,
     },
     phoneNumber: {
         type: [String],
@@ -115,7 +127,7 @@ const userSchema = new Schema<IUser>({
     role: {
         type: String,
         required: true,
-        default: "USER", 
+        default: "USER",
     },
     deliveryInfoList: {
         type: [{
@@ -149,37 +161,37 @@ const userSchema = new Schema<IUser>({
             id: {
                 type: String,
                 required: true,
-                unique:true,
-              },
-              userId: {
+                unique: true,
+            },
+            userId: {
                 type: String,
                 required: true,
-              },
-              items: {
+            },
+            items: {
                 type: [
-                  {
-                    productId: String,
-                    quantity: Number
-                  }
+                    {
+                        productId: String,
+                        quantity: Number
+                    }
                 ],
                 required: true
-              },
-              totalPrice: {
+            },
+            totalPrice: {
                 type: Number,
                 required: true,
-              },
-              shippingAddress: {
+            },
+            shippingAddress: {
                 type: Schema.Types.ObjectId,
                 required: false,
-              },
-              updateAt: {
+            },
+            updateAt: {
                 type: Date,
                 default: Date.now,
-              },
-              createdAt: {
+            },
+            createdAt: {
                 type: Date,
                 default: Date.now,
-              },
+            },
         }],
         required: false,
     },
@@ -195,7 +207,7 @@ const userSchema = new Schema<IUser>({
     },
 });
 
+userSchema.plugin(passportLocalMongoose)
 
-
-const UserModel : Model<IUser> = mongoose.model<IUser>('User', userSchema);
+const UserModel: Model<IUser> = mongoose.model<IUser>('User', userSchema);
 export { UserModel, IUser, IDeliveryInfo, DeliveryInfoModel};

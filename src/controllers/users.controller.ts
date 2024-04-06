@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 import { validate } from 'class-validator';
 
 const getUserDetails = async (req : Request, res : Response) => {
-
+    return res.json({auth: "ok"})
 };
 
 const updateUserDetails = async (req : Request, res : Response) => {
