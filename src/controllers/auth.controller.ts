@@ -2,8 +2,8 @@ import { UserModel } from "../models";
 import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
 import { Request, Response } from "express";
-import { loginService, signInService } from "../services/auth.service";
-import { LoginDto, SignInDto } from "../dtos/auth";
+import { SendOptService, VerifyOptService, loginService, signInService } from "../services/auth.service";
+import { CreateOtpDto, LoginDto, SignInDto, VerifyOtpDto } from "../dtos/auth";
 import { validate } from 'class-validator';
 
 const signInController = async (req: Request, res: Response)=> {
@@ -48,17 +48,6 @@ const loginController = async (req: Request, res: Response) => {
     return res.status(returnData.status).json(returnData.data)
 };
 
-// const deleteAccount = async (req : Request, res : Response) => {
-//     const user = req.user;
-//     try {
-//         await user.delete(); // Delete user and related data (orders, reviews, etc.) - Implement logic as needed
-//         res.json({ message: "Account deleted successfully" });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: "Account deletion failed" });
-//     }
-// };
-
 // const forgotPassword = async (req, res) => {
 //     const { email } = req.body;
 
@@ -94,6 +83,7 @@ const loginController = async (req: Request, res: Response) => {
 //         res.status(500).json({ error: "Failed to send password reset link" });
 //     }
 // };
+
 // const resetPassword = async (req, res) => {
 //     const { resetToken, password } = req.body;
 
@@ -119,21 +109,43 @@ const loginController = async (req: Request, res: Response) => {
 //     }
 // };
 
-// const verifyOTP = async (req, res) => {
-//     const { email, otp } = req.body;
-//     try {
-//         const user = await User.findOne({ email });
-//         if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
-//             return res.status(400).json({ error: "Invalid OTP" });
-//         }
-//         // Implement login or password reset logic here
-//         res.json({ message: "OTP verified successfully" });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: "Failed to verify OTP" });
-//     }
-// };
+const verifyOtpController = async (req: Request, res: Response) => {
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, otpCode, type } = req.body;
+    let dto = new VerifyOtpDto();
+    dto.email = email;
+    dto.type= type;
+    dto.otpCode = otpCode;
+    validate(dto).then(errors => {
+        if (errors.length > 0) {
+            res.status(500).json({ errors: errors },);
+        }
+    });
+    const returnData = await VerifyOptService(dto)
+    return res.status(returnData.status).json(returnData.data)
+};
+
+const sendOtpController = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, type } = req.body;
+    let dto = new CreateOtpDto();
+    dto.email = email;
+    dto.type= type;
+    validate(dto).then(errors => {
+        if (errors.length > 0) {
+            res.status(500).json({ errors: errors },);
+        }
+    });
+    const returnData = await SendOptService(dto)
+    return res.status(returnData.status).json(returnData.data)
+};
 // const changePassword = async (req, res) => {
 //     const { currentPassword, newPassword, confirmPassword } = req.body;
 //     const user = req.user;
@@ -151,10 +163,10 @@ const loginController = async (req: Request, res: Response) => {
 export {
     signInController,
     loginController,
-    // logout,
+    verifyOtpController,
+    sendOtpController
     // deleteAccount,
     // changePassword,
-    // verifyOTP,
     // resetPassword,
     // forgotPassword
 };
