@@ -5,15 +5,21 @@ import {LoginDto} from "dtos/auth/login.dto";
 import { SignInDto } from "dtos/auth";
 import { v5 as uuidv5 } from 'uuid';
 import { Types } from "mongoose";
+import { use } from "passport";
 
 export async function loginService(dto: LoginDto) {
     try {
-        const user = await UserModel.findOne({ email: dto.email });
-        if (!user || !(bcrypt.compare(dto.password, user.hash))) {
-            return { data : {error: "Invalid username or password"}, status: 401 };
+        const user = await UserModel.findOne({ email: dto.email }).select('+hash');
+        if (!user) {
+            return { data : {error: "User is not exist"}, status: 401 };
+        }
+        if (!(await bcrypt.compare(dto.password, user.hash))) {
+            return { data : {error: "Invalid password"}, status: 401 };
         }
         const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5});
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
+        user.refresh_token = refresh_token
+        await user.save();
         return { data : {access_token, refresh_token}, status: 200 };
     } catch (error) {
         console.error(error);

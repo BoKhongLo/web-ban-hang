@@ -1,10 +1,18 @@
 import mongoose, { Schema, Model, Types } from "mongoose";
 import { CartModel, ICart } from "./Cart.model";
+import passportLocalMongoose from "passport-local-mongoose";
+import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 interface IDeliveryInfo {
   name: string;
   phoneNumber: string;
   address: string;
+}
+
+export interface AuthToken {
+    accessToken: string;
+    kind: string;
 }
 
 const DeliveryInfo = new Schema<IDeliveryInfo>({
@@ -59,6 +67,7 @@ interface IUser {
 
   createdAt: Date;
 }
+DeliveryInfo.plugin(passportLocalMongoose)
 const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(
   "DeliveryInfo",
   DeliveryInfo
@@ -201,6 +210,6 @@ const userSchema = new Schema<IUser>({
     default: Date.now,
   },
 });
-
+userSchema.plugin(passportLocalMongoose)
 const UserModel: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 export { UserModel, IUser, IDeliveryInfo, DeliveryInfoModel };

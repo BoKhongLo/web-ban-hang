@@ -36,7 +36,6 @@ const loginController = async (req: Request, res: Response) => {
         return res.status(400).json({ errors: errors.array() });
     }
     const { email, password } = req.body;
-    console.log(req.body);
     let dto = new LoginDto();
     dto.email = email;
     dto.password = password;

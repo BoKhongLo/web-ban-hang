@@ -6,6 +6,6 @@ const routerUser = express.Router();
 routerUser.get("/", (req, res) => {
     res.send("GET users");
 });
-routerUser.get("/getUserDetails", getUserDetails);
-routerUser.post("/updateUserDetails", updateUserDetails);
+routerUser.get("/detail", getUserDetails);
+routerUser.post("/update", updateUserDetails);
 export { routerUser };
