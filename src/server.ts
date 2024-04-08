@@ -4,7 +4,7 @@ import { engine } from "express-handlebars";
 import * as dotenv from "dotenv";
 import bodyParser from "body-parser";
 import { connectDb } from "./config/database.ts";
-import { routerAuth, routerUser } from "./routes";
+import { routerAuth, routerMedia, routerUser } from "./routes";
 import passport from "passport";
 import session from "express-session";
 import "./config/passport.ts"
@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { roomHandler } from "./config/websocket.ts";
 import "./config/mailer.ts"
+import multer from 'multer';
 
 dotenv.config();
 
@@ -53,13 +54,15 @@ app.use(
 let jsonParser = bodyParser.json()
 let urlencodedParser = bodyParser.urlencoded({ extended: true })
 app.use(morgan('combined'))
-
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 //routes
 app.use("/user", urlencodedParser, passport.authenticate('jwt', { session: false }), routerUser)
 app.use("/auth", urlencodedParser, routerAuth)
+app.use("/media", routerMedia)
 
 io.on("connection", (socket) => {
     console.log("a user connected");
@@ -68,7 +71,6 @@ io.on("connection", (socket) => {
         console.log("user disconnected");
     });
 });
-
 
 httpServer.listen(port, async () => {
     await connectDb();
