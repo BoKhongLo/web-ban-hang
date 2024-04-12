@@ -214,7 +214,7 @@ const userSchema = new Schema<IUser>({
     required: true, 
     default: Date.now,
   },
-});
+} );
 userSchema.plugin(passportLocalMongoose)
 const UserModel: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 export { UserModel, IUser, IDeliveryInfo, DeliveryInfoModel };
