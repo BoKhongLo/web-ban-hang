@@ -42,6 +42,10 @@ interface IUser extends Document {
 
   phoneNumber?: Types.Array<string>;
 
+  imgDisplay: Types.Array<string>;
+
+  birthday: Date;
+
   address: string;
 
   gender: string;
@@ -108,6 +112,14 @@ const userSchema = new Schema<IUser>({
   phoneNumber: {
     type: [String],
     required: true,
+  },
+  imgDisplay: {
+    type: [String],
+    required: false,
+  },
+  birthday: {
+    type: Date,
+    required: false,
   },
   address: {
     type: String,
