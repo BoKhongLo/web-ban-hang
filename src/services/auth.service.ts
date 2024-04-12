@@ -36,6 +36,12 @@ export async function signInService(dto: SignInDto) {
         if (userCheck) {
             return { data : {error: "User is exist!"}, status: 401 };
         }
+
+        const optCheck = await OtpModel.findOne({ id: dto.otpId})
+        if (!optCheck) {
+            return { data : {error: "Otp is not validate!"}, status: 401 };
+        }
+
         const user = new UserModel();
         user.id = uuidv5(dto.email, uuidv5.URL)
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
@@ -179,9 +185,39 @@ export async function VerifyOptService(dto: VerifyOtpDto) {
         optCheck.value = true;
         optCheck.isDisplay = false;
         await optCheck.save();
-        return { data : {}, status: 200 };
+        return { data : {optId: optCheck.id, value: optCheck.value}, status: 200 };
     } catch (error) {
         console.error(error);
         return { data : { error: "Verify Otp failed" }, status: 500 };
+    }
+}
+
+
+export async function RefreshTokenService(dto) {
+    try {
+        const token : any = await new Promise((resolve, reject) => {
+            jwt.verify(dto, process.env.JWT_SECRET_KEY_REFRESH, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        const userCheck = await UserModel.findOne({ id: token.id });
+
+        if (!userCheck) {
+            return { data: { error: "User not found" }, status: 404 };
+        }
+
+        const access_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5 });
+        const refresh_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d' });
+        
+        userCheck.refresh_token = refresh_token;
+        await userCheck.save();
+
+        return { data: { access_token, refresh_token }, status: 200 };
+    } catch (error) {
+        return { data: { error: "Error refreshing token" }, status: 500 };
     }
 }

@@ -10,7 +10,12 @@ const uploadFileController = async (req: Request, res: Response) => {
             res.status(400).send('No file uploaded.');
             return;
         }
-        res.send('File uploaded successfully.');
+        let urlReturn = []
+        for (let i in req.files) {
+            let pathFile = req.files[i].path.toString();
+            urlReturn.push(pathFile.substring(8, pathFile.length));
+        }
+        res.json({fileUrl: urlReturn});
     } catch (error) {
         res.status(500).send(error.message);
     }

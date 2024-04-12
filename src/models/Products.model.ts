@@ -1,19 +1,18 @@
 import mongoose, { Schema, Types, Date, Model, Document } from "mongoose";
 
-interface IImage extends Document{
-  imageUrl: String;
-}
-interface IComment extends Document {
+interface IMessages extends Document {
   id: string;
+  typeMegs: string;
   userId: string;
   isDisplay: boolean;
   title: string;
   content: string;
-  urlFile: IImage[];
+  urlFile: string[];
   star: number;
   updateAt: Date;
   createdAt: Date;
 }
+
 interface IProduct extends Document {
   id: string;
   productName: string;
@@ -21,12 +20,12 @@ interface IProduct extends Document {
   description?: string;
   price: number;
   stockQuantity: number;
-  img: Types.Array<IImage>;
+  imgDisplay: Types.Array<string>;
   productType: string;
   pattern: string[];
   buyCount?: number;
   rating?: number;
-  commentsList: Types.DocumentArray<IComment>;
+  commentsList: Types.DocumentArray<IMessages>;
   detail: string;
   isSale: boolean;
   updateAt: Date,
@@ -68,6 +67,10 @@ const productSchema = new Schema<IProduct>({
     type: [String],
     required: false,
   },
+  imgDisplay: {
+    type: [String],
+    required: false,
+  },
   buyCount: {
     type: Number,
     require: false,
@@ -101,6 +104,10 @@ const productSchema = new Schema<IProduct>({
           type: String,
           required: true,
         },
+        typeMegs: {
+          type: String,
+          required: true,
+        },
         userID: {
           type: String,
           required: true,
@@ -110,7 +117,7 @@ const productSchema = new Schema<IProduct>({
           required: true,
         },
         content: { type: String, required: true },
-        urlFile: { type: [{ imageUrl: [String] }], required: true },
+        urlFile: { type: [String] , required: true },
         star: { type: Number, required: true },
         updateAt: {
           type: Date,
@@ -136,4 +143,4 @@ const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
   "Product",
   productSchema
 );
-export { ProducModel, IProduct };
+export { ProducModel, IProduct, IMessages };

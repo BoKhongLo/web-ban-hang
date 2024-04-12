@@ -2,7 +2,7 @@ import { UserModel } from "../models";
 import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
 import { Request, Response } from "express";
-import { SendOptService, VerifyOptService, loginService, signInService } from "../services/auth.service";
+import { RefreshTokenService, SendOptService, VerifyOptService, loginService, signInService } from "../services/auth.service";
 import { CreateOtpDto, LoginDto, SignInDto, VerifyOtpDto } from "../dtos/auth";
 import { validate } from 'class-validator';
 
@@ -20,7 +20,8 @@ const signInController = async (req: Request, res: Response)=> {
     dto.username = req.body.username;
     dto.address = req.body.address;
     dto.gender = req.body.gender;
-
+    dto.otpId = req.body.otpId;
+    
     validate(dto).then(errors => {
         if (errors.length > 0) {
             res.status(500).json({ errors: errors },);
@@ -46,6 +47,23 @@ const loginController = async (req: Request, res: Response) => {
     });
     const returnData = await loginService(dto)
     return res.status(returnData.status).json(returnData.data)
+};
+
+const refreshController = async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    if (typeof req.headers.authorization !== 'string') {
+        return res.status(400).json({ error: 'Invalid Authorization header' });
+    }
+    const token = req.headers.authorization.split(' ')[1];
+    if(token){
+        const returnData = await RefreshTokenService(token)
+        return res.status(returnData.status).json(returnData.data)
+    }else {
+        return res.status(400).json({ errors: "Invalid Authorization header" });
+    }
 };
 
 // const forgotPassword = async (req, res) => {
@@ -164,7 +182,8 @@ export {
     signInController,
     loginController,
     verifyOtpController,
-    sendOtpController
+    sendOtpController,
+    refreshController
     // deleteAccount,
     // changePassword,
     // resetPassword,

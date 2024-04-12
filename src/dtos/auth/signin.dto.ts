@@ -14,6 +14,10 @@ export class SignInDto {
   @IsString()
   public username: string;
 
+  @IsNotEmpty()
+  @IsString()
+  public otpId: string;
+
   @IsOptional()
   @IsString()
   public firstName?: string;

@@ -1,15 +1,5 @@
 import mongoose, { Schema, Types, Model, Document } from "mongoose";
-
-interface IMessages extends Document  {
-  id: string;
-  email: string;
-  otpCode: string;
-  type: string;
-  value: boolean;
-  isDisplay: boolean;
-  updateAt: Date,
-  createdAt: Date
-}
+import { IMessages } from "./Products.model";
 
 interface IRoomchat extends Document {
   id: string;
@@ -19,7 +9,6 @@ interface IRoomchat extends Document {
   messages: Types.DocumentArray<IMessages>;
   updateAt: Date;
   createdAt: Date;
-
 }
 
 const roomchatSchema = new Schema<IRoomchat>({
@@ -47,26 +36,27 @@ const roomchatSchema = new Schema<IRoomchat>({
           type: String,
           required: true,
         },
-        userId: {
+        typeMegs: {
           type: String,
+          required: true,
         },
-        isDisplay: {
-          type: Boolean,
-        },
-        content: {
+        userID: {
           type: String,
+          required: true,
         },
-        urlFile: {
-          type: [String],
+        title: {
+          type: String,
+          required: true,
+        },
+        content: { type: String, required: true },
+        urlFile: { type: [String] , required: true },
+        star: { type: Number, required: true },
+        updateAt: {
+          type: Date,
+          default: Date.now,
         },
         createdAt: {
           type: Date,
-          required: false,
-          default: Date.now,
-        },
-        updateAt: {
-          type: Date,
-          required: false,
           default: Date.now,
         },
       },
