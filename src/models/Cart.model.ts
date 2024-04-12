@@ -1,14 +1,14 @@
-import mongoose, { Schema, Types, Model } from "mongoose";
+import mongoose, { Schema, Types, Model, Document } from "mongoose";
 import { IDeliveryInfo, DeliveryInfoModel } from './Users.model';
 import passportLocalMongoose from "passport-local-mongoose";
 
 
-interface ICartItem {
+interface ICartItem extends Document {
   productId: string;
   quantity: number;
 }
 
-interface ICart {
+interface ICart extends Document {
   id: string,
 
   userId: string,
@@ -67,10 +67,12 @@ const cartSchema = new Schema<ICart>({
   updateAt: {
     type: Date,
     default: Date.now,
+    required: true, 
   },
   createdAt: {
     type: Date,
     default: Date.now,
+    required: true, 
   },
 })
 cartSchema.plugin(passportLocalMongoose)

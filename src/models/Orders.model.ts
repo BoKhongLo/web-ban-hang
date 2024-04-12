@@ -1,7 +1,8 @@
-import mongoose, { Schema, Types, Date, Model } from "mongoose";
+import mongoose, { Schema, Types, Date, Model, Document } from "mongoose";
 import { ProducModel, IProduct } from "./Products.model";
 import { IDeliveryInfo } from "./Users.model";
-interface IOrder {
+
+interface IOrder extends Document {
   id: string;
   userId: string;
   isDisplay: boolean;
@@ -41,10 +42,12 @@ const orderSchema = new Schema<IOrder>({
   updateAt: {
     type: Date,
     default: Date.now,
+    required: true, 
   },
   createdAt: {
     type: Date,
     default: Date.now,
+    required: true, 
   },
   listProducts: {
     type: [
@@ -130,10 +133,12 @@ const orderSchema = new Schema<IOrder>({
               updateAt: {
                 type: Date,
                 default: Date.now,
+                required: true, 
               },
               createdAt: {
                 type: Date,
                 default: Date.now,
+                required: true, 
               },
             },
           ],

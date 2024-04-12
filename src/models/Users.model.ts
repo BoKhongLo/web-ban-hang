@@ -1,18 +1,11 @@
-import mongoose, { Schema, Model, Types } from "mongoose";
+import mongoose, { Schema, Model, Types, Document} from "mongoose";
 import { CartModel, ICart } from "./Cart.model";
 import passportLocalMongoose from "passport-local-mongoose";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
 
-interface IDeliveryInfo {
+interface IDeliveryInfo  extends Document{
   name: string;
   phoneNumber: string;
   address: string;
-}
-
-export interface AuthToken {
-    accessToken: string;
-    kind: string;
 }
 
 const DeliveryInfo = new Schema<IDeliveryInfo>({
@@ -30,7 +23,7 @@ const DeliveryInfo = new Schema<IDeliveryInfo>({
   },
 });
 
-interface IUser {
+interface IUser extends Document {
   id: string;
 
   isDisplay: boolean;
@@ -185,7 +178,7 @@ const userSchema = new Schema<IUser>({
         },
         shippingAddress: {
           type: Schema.Types.ObjectId,
-          required: false,	
+          required: false,
         },
         updateAt: {
           type: Date,
@@ -201,12 +194,12 @@ const userSchema = new Schema<IUser>({
   },
   updateAt: {
     type: Date,
-    required: false,
+    required: true, 
     default: Date.now,
   },
   createdAt: {
     type: Date,
-    required: false,
+    required: true, 
     default: Date.now,
   },
 });

@@ -1,8 +1,9 @@
-import mongoose, { Schema, Types, Date, Model } from "mongoose";
-interface IImage {
+import mongoose, { Schema, Types, Date, Model, Document } from "mongoose";
+
+interface IImage extends Document{
   imageUrl: String;
 }
-interface IComment {
+interface IComment extends Document {
   id: string;
   userId: string;
   isDisplay: boolean;
@@ -13,7 +14,7 @@ interface IComment {
   updateAt: Date;
   createdAt: Date;
 }
-interface IProduct {
+interface IProduct extends Document {
   id: string;
   productName: string;
   isDisplay: boolean;
@@ -28,6 +29,8 @@ interface IProduct {
   commentsList: Types.DocumentArray<IComment>;
   detail: string;
   isSale: boolean;
+  updateAt: Date,
+  createdAt: Date
 }
 
 const productSchema = new Schema<IProduct>({
@@ -119,6 +122,14 @@ const productSchema = new Schema<IProduct>({
         },
       },
     ],
+  },
+  updateAt: {
+    type: Date,
+    default: Date.now,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
