@@ -59,6 +59,7 @@ interface IUser extends Document {
   updateAt: Date;
 
   createdAt: Date;
+
 }
 DeliveryInfo.plugin(passportLocalMongoose)
 const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(

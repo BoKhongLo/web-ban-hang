@@ -9,9 +9,11 @@ const addToCart = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const dto = new CartDto();
+  
+};
+const removeFromCart = async (req: Request, res: Response) => {
 
 };
-const removeFromCart = async (req: Request, res: Response) => {};
 const removeAllFromCart = async (req: Request, res: Response) => {};
 
 export { addToCart, removeAllFromCart, removeFromCart };
