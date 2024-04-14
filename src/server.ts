@@ -4,7 +4,7 @@ import { engine } from "express-handlebars";
 import * as dotenv from "dotenv";
 import bodyParser from "body-parser";
 import { connectDb } from "./config/database.ts";
-import { routerAuth, routerMedia, routerUser } from "./routes";
+import { routerAuth, routerMedia, routerProduct, routerUser } from "./routes";
 import passport from "passport";
 import session from "express-session";
 import "./config/passport.ts"
@@ -63,6 +63,7 @@ app.use(passport.session());
 app.use("/user", urlencodedParser, passport.authenticate('jwt', { session: false }), routerUser)
 app.use("/auth", urlencodedParser, routerAuth)
 app.use("/media", routerMedia)
+app.use("/product", routerProduct)
 
 io.on("connection", (socket) => {
     console.log("a user connected");
@@ -76,5 +77,3 @@ httpServer.listen(port, async () => {
     await connectDb();
     console.log(`Listening on port http://localhost:${port}`);
 });
-
-

@@ -58,7 +58,7 @@ interface IUser extends Document {
 
   memberLevel: string;
 
-  cart: Types.DocumentArray<ICart>;
+  cart?: Types.DocumentArray<ICart>;
 
   updateAt: Date;
 

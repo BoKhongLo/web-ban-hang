@@ -2,68 +2,74 @@ import { UserModel } from "../models";
 import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
 import { Request, Response } from "express";
-import { RefreshTokenService, SendOptService, VerifyOptService, loginService, signInService } from "../services/auth.service";
+import {
+  RefreshTokenService,
+  SendOptService,
+  VerifyOptService,
+  loginService,
+  signInService,
+} from "../services/auth.service";
 import { CreateOtpDto, LoginDto, SignInDto, VerifyOtpDto } from "../dtos/auth";
-import { validate } from 'class-validator';
+import { validate } from "class-validator";
 
-const signInController = async (req: Request, res: Response)=> {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+const   signInController = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const dto = new SignInDto();
+  dto.email = req.body.email;
+  dto.password = req.body.password;
+  dto.phoneNumber = req.body.phoneNumber;
+  dto.firstName = req.body.firstName;
+  dto.lastName = req.body.lastName;
+  dto.username = req.body.username;
+  dto.address = req.body.address;
+  dto.gender = req.body.gender;
+  dto.otpId = req.body.otpId;
+
+  validate(dto).then((errors) => {
+    if (errors.length > 0) {
+      res.status(500).json({ errors: errors });
     }
-    const dto = new SignInDto();
-    dto.email = req.body.email;
-    dto.password = req.body.password;
-    dto.phoneNumber = req.body.phoneNumber;
-    dto.firstName = req.body.firstName;
-    dto.lastName = req.body.lastName;
-    dto.username = req.body.username;
-    dto.address = req.body.address;
-    dto.gender = req.body.gender;
-    dto.otpId = req.body.otpId;
-    
-    validate(dto).then(errors => {
-        if (errors.length > 0) {
-            res.status(500).json({ errors: errors },);
-        }
-    });
-    const returnData = await signInService(dto);
-    return res.status(returnData.status).json(returnData.data)
+  });
+  const returnData = await signInService(dto);
+  return res.status(returnData.status).json(returnData.data);
 };
 
 const loginController = async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { email, password } = req.body;
+  let dto = new LoginDto();
+  dto.email = email;
+  dto.password = password;
+  validate(dto).then((errors) => {
+    if (errors.length > 0) {
+      res.status(500).json({ errors: errors });
     }
-    const { email, password } = req.body;
-    let dto = new LoginDto();
-    dto.email = email;
-    dto.password = password;
-    validate(dto).then(errors => {
-        if (errors.length > 0) {
-            res.status(500).json({ errors: errors },);
-        }
-    });
-    const returnData = await loginService(dto)
-    return res.status(returnData.status).json(returnData.data)
+  });
+  const returnData = await loginService(dto);
+  return res.status(returnData.status).json(returnData.data);
 };
 
 const refreshController = async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-    if (typeof req.headers.authorization !== 'string') {
-        return res.status(400).json({ error: 'Invalid Authorization header' });
-    }
-    const token = req.headers.authorization.split(' ')[1];
-    if(token){
-        const returnData = await RefreshTokenService(token)
-        return res.status(returnData.status).json(returnData.data)
-    }else {
-        return res.status(400).json({ errors: "Invalid Authorization header" });
-    }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  if (typeof req.headers.authorization !== "string") {
+    return res.status(400).json({ error: "Invalid Authorization header" });
+  }
+  const token = req.headers.authorization.split(" ")[1];
+  if (token) {
+    const returnData = await RefreshTokenService(token);
+    return res.status(returnData.status).json(returnData.data);
+  } else {
+    return res.status(400).json({ errors: "Invalid Authorization header" });
+  }
 };
 
 // const forgotPassword = async (req, res) => {
@@ -128,41 +134,40 @@ const refreshController = async (req: Request, res: Response) => {
 // };
 
 const verifyOtpController = async (req: Request, res: Response) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { email, otpCode, type } = req.body;
+  let dto = new VerifyOtpDto();
+  dto.email = email;
+  dto.type = type;
+  dto.otpCode = otpCode;
+  validate(dto).then((errors) => {
+    if (errors.length > 0) {
+      res.status(500).json({ errors: errors });
     }
-    const { email, otpCode, type } = req.body;
-    let dto = new VerifyOtpDto();
-    dto.email = email;
-    dto.type= type;
-    dto.otpCode = otpCode;
-    validate(dto).then(errors => {
-        if (errors.length > 0) {
-            res.status(500).json({ errors: errors },);
-        }
-    });
-    const returnData = await VerifyOptService(dto)
-    return res.status(returnData.status).json(returnData.data)
+  });
+  const returnData = await VerifyOptService(dto);
+  return res.status(returnData.status).json(returnData.data);
 };
 
 const sendOtpController = async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const { email, type } = req.body;
+  let dto = new CreateOtpDto();
+  dto.email = email;
+  dto.type = type;
+  validate(dto).then((errors) => {
+    if (errors.length > 0) {
+      res.status(500).json({ errors: errors });
     }
-    const { email, type } = req.body;
-    let dto = new CreateOtpDto();
-    dto.email = email;
-    dto.type= type;
-    validate(dto).then(errors => {
-        if (errors.length > 0) {
-            res.status(500).json({ errors: errors },);
-        }
-    });
-    const returnData = await SendOptService(dto)
-    return res.status(returnData.status).json(returnData.data)
+  });
+  const returnData = await SendOptService(dto);
+  return res.status(returnData.status).json(returnData.data);
 };
 // const changePassword = async (req, res) => {
 //     const { currentPassword, newPassword, confirmPassword } = req.body;
@@ -179,13 +184,13 @@ const sendOtpController = async (req: Request, res: Response) => {
 // };
 
 export {
-    signInController,
-    loginController,
-    verifyOtpController,
-    sendOtpController,
-    refreshController
-    // deleteAccount,
-    // changePassword,
-    // resetPassword,
-    // forgotPassword
+  signInController,
+  loginController,
+  verifyOtpController,
+  sendOtpController,
+  refreshController,
+  // deleteAccount,
+  // changePassword,
+  // resetPassword,
+  // forgotPassword
 };

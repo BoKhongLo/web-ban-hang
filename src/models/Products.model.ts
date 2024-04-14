@@ -8,27 +8,44 @@ interface IMessages extends Document {
   title: string;
   content: string;
   urlFile: string[];
-  star: number;
+  star: String;
   updateAt: Date;
   createdAt: Date;
 }
 
 interface IProduct extends Document {
   id: string;
+
   productName: string;
+
   isDisplay: boolean;
+
   description?: string;
-  price: number;
-  stockQuantity: number;
+
+  cost : String;
+
+  price: String;
+
+  stockQuantity: String;
+
   imgDisplay: Types.Array<string>;
+
   productType: string;
+
   pattern: string[];
-  buyCount?: number;
-  rating?: number;
+
+  buyCount?: String;
+
+  rating?: String;
+
   commentsList: Types.DocumentArray<IMessages>;
+
   detail: string;
+
   isSale: boolean;
+
   updateAt: Date,
+
   createdAt: Date
 }
 
@@ -43,20 +60,22 @@ const productSchema = new Schema<IProduct>({
     required: true,
     validate: {
       validator: (value: string) => value.length > 3,
-      message: "username must be at least 3 characters",
+      message: "Tên người dùng phải có nhiều hơn 3 kí tự.",
     },
   },
   isDisplay: {
     type: Boolean,
     required: true,
+    default: true,
   },
   description: {
     type: String,
     required: false,
-    default: "Một sản phẩm từ....",
+    default: "Sản phẩm với chất liệu mềm mại, siêu thấm hút mồ hôi, ........",
   },
-  price: { type: Number, required: true },
-  stockQuantity: { type: Number, required: true },
+  cost: { type: String, required: true },
+  price: { type: String, required: true },
+  stockQuantity: { type: String, required: true },
   productType: {
     type: String,
     main: String,
@@ -72,11 +91,11 @@ const productSchema = new Schema<IProduct>({
     required: false,
   },
   buyCount: {
-    type: Number,
+    type: String,
     require: false,
   },
   rating: {
-    type: Number,
+    type: String,
     require: false,
   },
   detail: {
@@ -90,7 +109,7 @@ const productSchema = new Schema<IProduct>({
     type: Boolean,
     default: false,
     percent: {
-      type: Number,
+      type: String,
       default: 0,
     },
     end: {
@@ -118,7 +137,7 @@ const productSchema = new Schema<IProduct>({
         },
         content: { type: String, required: true },
         urlFile: { type: [String] , required: true },
-        star: { type: Number, required: true },
+        star: { type: String, required: true },
         updateAt: {
           type: Date,
           default: Date.now,
