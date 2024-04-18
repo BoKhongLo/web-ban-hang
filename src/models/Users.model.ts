@@ -69,6 +69,8 @@ interface IUser extends Document {
   updateAt: Date;
 
   createdAt: Date;
+
+  idCart : String;
 }
 
 const userSchema = new Schema<IUser>({

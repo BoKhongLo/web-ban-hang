@@ -9,14 +9,14 @@ export async function getAllRoomService(adminId: string) {
             id: adminId,
         })
         if (!userCheck) {
-            return { data : {error: "User is exist!"}, status: 401 };
+            return { data : {error: "The user is exist!"}, status: 401 };
         }
-        if (!("ADMIN" in userCheck.role || "TELESAlES" in userCheck.role))  {
-            return { data : {error: "User is exist!"}, status: 401 };
-        }
-        if ("BANNED" in userCheck.role) {
-            return { data : {error: "the user is banned!"}, status: 401 };
-        }
+        if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("TELESALES"))) {
+            return { data: { error: "The user is not permission" }, status: 401 };
+          }
+        if (userCheck.role.includes("BANNED")) {
+            return { data: { error: "the user is banned!" }, status: 401 };
+          }
         let allRoom = await roomchatModel.find();
         let dataReturn = [];
         allRoom.map((value, index) => {
@@ -49,12 +49,31 @@ export async function createRoomService(userId: string) {
 
 export async function addMessageService(megs: IMessages) {
     try {
+        let userCheck = await UserModel.findOne({
+            id: megs.userId,
+        })
+        if (!userCheck) {
+            return null;
+        }
+        if (userCheck.role.includes("BANNED")) {
+            return null;
+        }
+
         let roomUser = await roomchatModel.findOne({
             id: megs.roomId,
         });
-
         if (!roomUser) {
             return null;
+        }
+
+        if (roomUser.isDisplay == false || roomUser.isBlock == false) {
+            return null;
+        }
+
+        if (roomUser.userId !== megs.userId) {
+            if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("WEREHOUSEMANGER"))) {
+                return null;
+            }
         }
 
         let newMessage = new MessagesModel();
@@ -81,9 +100,9 @@ export async function getRoomByIdService(userId: string) {
         if (!userCheck) {
             return { data : {error: "User is exist!"}, status: 401 };
         }
-        if ("BANNED" in userCheck.role) {
-            return { data : {error: "the user is banned!"}, status: 401 };
-        }
+        if (userCheck.role.includes("BANNED")) {
+            return { data: { error: "the user is banned!" }, status: 401 };
+          }
         let roomUser = await roomchatModel.findOne({
             userId: userId,
         });

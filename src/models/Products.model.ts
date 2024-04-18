@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types, Date, Model, Document } from "mongoose";
+import mongoose, { Schema, Types, Model, Document } from "mongoose";
 
 interface IMessages extends Document {
   id?: string;
@@ -55,22 +55,45 @@ const MessagesModel: Model<IMessages> = mongoose.model<IMessages>(
   messagesSchema
 );
 
+interface ISales extends Document {
+  isSales: boolean;
+  percents: number;
+  end: Date;
+}
+
 interface IProduct extends Document {
   id: string;
+
   productName: string;
+
   isDisplay: boolean;
+
   description?: string;
+
+  cost: number;
+
   price: number;
+
   stockQuantity: number;
+
   imgDisplay: Types.Array<string>;
+
   productType: string;
-  pattern: string[];
+
+  pattern: Types.Array<string>;
+
   buyCount?: number;
+
   rating?: number;
+
   commentsList: Types.DocumentArray<IMessages>;
+
   detail: string;
-  isSale: boolean;
+
+  sales?: ISales;
+
   updateAt: Date,
+
   createdAt: Date
 }
 
@@ -85,18 +108,20 @@ const productSchema = new Schema<IProduct>({
     required: true,
     validate: {
       validator: (value: string) => value.length > 3,
-      message: "username must be at least 3 characters",
+      message: "Tên người dùng phải có nhiều hơn 3 kí tự.",
     },
   },
   isDisplay: {
     type: Boolean,
     required: true,
+    default: true,
   },
   description: {
     type: String,
     required: false,
-    default: "Một sản phẩm từ....",
+    default: "Sản phẩm với chất liệu mềm mại, siêu thấm hút mồ hôi, ........",
   },
+  cost: { type: Number, required: true },
   price: { type: Number, required: true },
   stockQuantity: { type: Number, required: true },
   productType: {
@@ -116,10 +141,12 @@ const productSchema = new Schema<IProduct>({
   buyCount: {
     type: Number,
     require: false,
+    default: 0,
   },
   rating: {
     type: Number,
     require: false,
+    default: 5,
   },
   detail: {
     type: String,
@@ -128,16 +155,26 @@ const productSchema = new Schema<IProduct>({
     labels: { type: String, required: false, default: "Shiro" },
     materials: { type: [String], required: true },
   },
-  isSale: {
-    type: Boolean,
-    default: false,
-    percent: {
-      type: Number,
-      default: 0,
+  sales: {
+    type: {
+      isSales: {
+        type: Boolean,
+        default: false,
+      },
+      percents: {
+        type: Number,
+        default: 0,
+      },
+      end: {
+        type: Date,
+        required: false,
+      },
     },
-    end: {
-      type: Date,
-    },
+    required: false,
+    default: {
+      isSales: false,
+      percents: 0
+    }
   },
   commentsList: {
     type: [

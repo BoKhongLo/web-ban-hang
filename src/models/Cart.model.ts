@@ -1,81 +1,91 @@
 import mongoose, { Schema, Types, Model, Document } from "mongoose";
-import { IDeliveryInfo, DeliveryInfoModel } from './Users.model';
+import { IDeliveryInfo, DeliveryInfoModel } from "./Users.model";
 import passportLocalMongoose from "passport-local-mongoose";
-
 
 interface ICartItem extends Document {
   productId: string;
-  quantity: number;
+  quantity: string;
 }
 
 interface ICart extends Document {
-  id: string,
+  id: string;
 
-  userId: string,
+  userId: string;
 
-  items: Types.DocumentArray<ICartItem>;
+  items?: Types.DocumentArray<ICartItem>;
 
-  totalPrice: number,
+  totalPrice: number;
 
-  shippingAddress?: IDeliveryInfo;
+  shippingAddress?: Types.DocumentArray<IDeliveryInfo>;
 
-  updateAt: Date,
+  updateAt: Date;
 
-  createdAt: Date
+  createdAt: Date;
+
+  totalItemCount: number;
 }
 
 const cartSchema = new Schema<ICart>({
   id: {
     type: String,
     required: true,
-    unique:true,
+    unique: true,
   },
-  userId: {
-    type: String,
-    required: true,
-  },
+  userId: { type: String, required: true },
   items: {
     type: [
       {
         productId: String,
-        quantity: Number
-      }
+        quantity: Number,
+      },
     ],
-    required: true
+    required: false,
+    default: [],
   },
   totalPrice: {
     type: Number,
-    required: true,
+    required: false,
+    default: 0,
+  },
+  totalItemCount: {
+    type: Number,
+    required: false,
+    default: 0,
   },
   shippingAddress: {
-    type: {
-      name: {
-        type: String,
-        required: true,
-      },
-      phoneNumber: {
+    type: [
+      {
+        name: {
           type: String,
           required: true,
-      },
-      address: {
+          default: "",
+        },
+        phoneNumber: {
           type: String,
           required: true,
+          default: "",
+        },
+        address: {
+          type: String,
+          required: true,
+          default: "",
+        },
       },
-    },
+    ],
     required: false,
   },
   updateAt: {
     type: Date,
     default: Date.now,
-    required: true, 
+    required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    required: true, 
+    required: true,
   },
-})
-cartSchema.plugin(passportLocalMongoose)
+});
+cartSchema.plugin(passportLocalMongoose);
 
 
 const CartModel : Model<ICart> = mongoose.model<ICart>('Cart', cartSchema);

@@ -4,16 +4,22 @@ import { engine } from "express-handlebars";
 import * as dotenv from "dotenv";
 import bodyParser from "body-parser";
 import { connectDb } from "./config/database.ts";
-import { routerAuth, routerMedia, routerUser } from "./routes";
 import passport from "passport";
 import session from "express-session";
-import "./config/passport.ts"
+import "./config/passport.ts";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import { roomHandler } from "./config/websocket.ts";
-import "./config/mailer.ts"
-import multer from 'multer';
+import "./config/mailer.ts";
+import multer from "multer";
+import {
+  routerAuth,
+  routerMedia,
+  routerProduct,
+  routerUser,
+  routerCart,
+} from "./routes";
 
 dotenv.config();
 
@@ -23,10 +29,10 @@ const port = process.env.PORT || 3000;
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-    cors: {
-        origin: "http://localhost:4200",
-        methods: ["GET", "POST"],
-    },
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST"],
+  },
 });
 
 app.use(express.json());
@@ -38,43 +44,47 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: false,
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 3,
-        },
-    })
-)
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 3,
+    },
+  })
+);
+// parse application/json
+app.use(bodyParser.json())
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }))
 
 
-let jsonParser = bodyParser.json()
-let urlencodedParser = bodyParser.urlencoded({ extended: true })
-app.use(morgan('combined'))
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(morgan("combined"));
 app.use(passport.initialize());
 app.use(passport.session());
 
 //routes
-app.use("/user", urlencodedParser, passport.authenticate('jwt', { session: false }), routerUser)
-app.use("/auth", urlencodedParser, routerAuth)
-app.use("/media", routerMedia)
-
+app.use(
+  "/user",
+  passport.authenticate("jwt", { session: false }),
+  routerUser
+);
+app.use("/auth", routerAuth);
+app.use("/media", routerMedia);
+app.use("/product", routerProduct);
+app.use("/cart", routerCart);
 io.on("connection", (socket) => {
-    console.log("a user connected");
-    roomHandler(socket);
-    socket.on("disconnect", () => {
-        console.log("user disconnected");
-    });
+  console.log("a user connected");
+  roomHandler(socket);
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 });
 
 httpServer.listen(port, async () => {
-    await connectDb();
-    console.log(`Listening on port http://localhost:${port}`);
+  await connectDb();
+  console.log(`Listening on port http://localhost:${port}`);
 });
-
-

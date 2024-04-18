@@ -52,7 +52,7 @@ passport.use(
     new JwtStrategy(
         {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: "super-secret-2.0",
+            secretOrKey: "super-secret",
         },
         async function (jwtToken, done) {
             try {
