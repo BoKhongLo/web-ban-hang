@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { UserModel } from "../models";
+import { CartModel, ICartItem, UserModel } from "../models";
 import jwt from "jsonwebtoken";
 import {LoginDto} from "dtos/auth/login.dto";
 import { CreateOtpDto, SignInDto, VerifyOtpDto } from "dtos/auth";
@@ -9,6 +9,7 @@ import * as otpGenerator from 'otp-generator';
 import { Types } from "mongoose";
 import { OtpModel } from "../models/OtpCode.model";
 import { sendMail } from "../config/mailer";
+import createId from "../utils/generater";
 
 export async function loginService(dto: LoginDto) {
     try {
@@ -18,6 +19,9 @@ export async function loginService(dto: LoginDto) {
         }
         if (!(await bcrypt.compare(dto.password, user.hash))) {
             return { data : {error: "Invalid password"}, status: 401 };
+        }
+        if ("BANNED" in user.role) {
+            return { data : {error: "the user is banned!"}, status: 401 };
         }
         const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5});
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
@@ -43,7 +47,7 @@ export async function signInService(dto: SignInDto) {
         }
 
         const user = new UserModel();
-        user.id = uuidv5(dto.email, uuidv5.URL)
+        user.id = await createId(dto.email, UserModel);
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
         const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5});
         const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -136,7 +140,7 @@ export async function SendOptService(dto: CreateOtpDto) {
             if (userCheck) {
                 return { data : {error: "User is exist!"}, status: 401 };
             }
-            if (userCheck.role === "BANNED") {
+            if ("BANNED" in userCheck.role) {
                 return { data : {error: "the user is banned!"}, status: 401 };
             }
             await sendMail(
@@ -171,6 +175,9 @@ export async function VerifyOptService(dto: VerifyOtpDto) {
         const userCheck = await UserModel.findOne({ email: dto.email });
         if (userCheck) {
             return { data : {error: "The user is exist!"}, status: 401 };
+        }
+        if ("BANNED" in userCheck.role) {
+            return { data : {error: "the user is banned!"}, status: 401 };
         }
         const optCheck = await OtpModel.findOne({ 
             email: dto.email, 
@@ -209,7 +216,9 @@ export async function RefreshTokenService(dto) {
         if (!userCheck) {
             return { data: { error: "User not found" }, status: 404 };
         }
-
+        if ("BANNED" in userCheck.role) {
+            return { data : {error: "the user is banned!"}, status: 401 };
+        }
         const access_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5 });
         const refresh_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d' });
         

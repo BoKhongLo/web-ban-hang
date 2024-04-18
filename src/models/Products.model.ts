@@ -1,17 +1,59 @@
 import mongoose, { Schema, Types, Date, Model, Document } from "mongoose";
 
 interface IMessages extends Document {
-  id: string;
+  id?: string;
   typeMegs: string;
   userId: string;
-  isDisplay: boolean;
-  title: string;
+  roomId?: string;
+  isDisplay?: boolean;
+  title?: string;
   content: string;
-  urlFile: string[];
-  star: number;
-  updateAt: Date;
-  createdAt: Date;
+  urlFile?: string[];
+  star?: number;
+  updateAt?: Date;
+  createdAt?: Date;
 }
+const messagesSchema = new Schema<IMessages>({
+  id: {
+    type: String,
+    required: false,
+  },
+  roomId: {
+    type: String,
+    required: false,
+  },
+  typeMegs: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: false,
+  },
+  content: { type: String, required: true },
+  urlFile: { type: [String] , required: false },
+  star: { type: Number, required: false },
+  updateAt: {
+    type: Date,
+    default: Date.now,
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    required: false,
+  },
+
+});
+
+const MessagesModel: Model<IMessages> = mongoose.model<IMessages>(
+  "Messages",
+  messagesSchema
+);
 
 interface IProduct extends Document {
   id: string;
@@ -102,30 +144,36 @@ const productSchema = new Schema<IProduct>({
       {
         id: {
           type: String,
-          required: true,
+          required: false,
+        },
+        roomId: {
+          type: String,
+          required: false,
         },
         typeMegs: {
           type: String,
           required: true,
         },
-        userID: {
+        userId: {
           type: String,
           required: true,
         },
         title: {
           type: String,
-          required: true,
+          required: false,
         },
         content: { type: String, required: true },
-        urlFile: { type: [String] , required: true },
-        star: { type: Number, required: true },
+        urlFile: { type: [String] , required: false },
+        star: { type: Number, required: false },
         updateAt: {
           type: Date,
           default: Date.now,
+          required: false,
         },
         createdAt: {
           type: Date,
           default: Date.now,
+          required: false,
         },
       },
     ],
@@ -143,4 +191,4 @@ const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
   "Product",
   productSchema
 );
-export { ProducModel, IProduct, IMessages };
+export { ProducModel, IProduct, IMessages, MessagesModel };

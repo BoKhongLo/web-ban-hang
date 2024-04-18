@@ -80,4 +80,4 @@ cartSchema.plugin(passportLocalMongoose)
 
 const CartModel : Model<ICart> = mongoose.model<ICart>('Cart', cartSchema);
 
-export { CartModel, ICart };
+export { CartModel, ICart, ICartItem };

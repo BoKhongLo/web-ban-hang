@@ -5,7 +5,7 @@ interface IRoomchat extends Document {
   id: string;
   isDisplay: boolean;
   isBlock: boolean;
-  memberRoomchat: Types.Array<string>;
+  userId: string;
   messages: Types.DocumentArray<IMessages>;
   updateAt: Date;
   createdAt: Date;
@@ -25,8 +25,8 @@ const roomchatSchema = new Schema<IRoomchat>({
     type: Boolean,
     required: true,
   },
-  memberRoomchat: {
-    type: [String],
+  userId: {
+    type: String,
     required: true,
   },
   messages: {
@@ -34,30 +34,36 @@ const roomchatSchema = new Schema<IRoomchat>({
       {
         id: {
           type: String,
-          required: true,
+          required: false,
+        },
+        roomId: {
+          type: String,
+          required: false,
         },
         typeMegs: {
           type: String,
           required: true,
         },
-        userID: {
+        userId: {
           type: String,
           required: true,
         },
         title: {
           type: String,
-          required: true,
+          required: false,
         },
         content: { type: String, required: true },
-        urlFile: { type: [String] , required: true },
-        star: { type: Number, required: true },
+        urlFile: { type: [String] , required: false },
+        star: { type: Number, required: false },
         updateAt: {
           type: Date,
           default: Date.now,
+          required: false,
         },
         createdAt: {
           type: Date,
           default: Date.now,
+          required: false,
         },
       },
     ],

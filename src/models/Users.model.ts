@@ -1,5 +1,4 @@
 import mongoose, { Schema, Model, Types, Document} from "mongoose";
-import { CartModel, ICart } from "./Cart.model";
 import passportLocalMongoose from "passport-local-mongoose";
 
 interface IDeliveryInfo  extends Document{
@@ -22,6 +21,13 @@ const DeliveryInfo = new Schema<IDeliveryInfo>({
     required: true,
   },
 });
+
+DeliveryInfo.plugin(passportLocalMongoose)
+
+const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(
+  "DeliveryInfo",
+  DeliveryInfo
+);
 
 interface IUser extends Document {
   id: string;
@@ -50,7 +56,7 @@ interface IUser extends Document {
 
   gender: string;
 
-  role: string;
+  role: Types.Array<string>;
 
   deliveryInfoList?: Types.DocumentArray<IDeliveryInfo>;
 
@@ -58,17 +64,12 @@ interface IUser extends Document {
 
   memberLevel: string;
 
-  cart: Types.DocumentArray<ICart>;
+  cartId: string;
 
   updateAt: Date;
 
   createdAt: Date;
 }
-DeliveryInfo.plugin(passportLocalMongoose)
-const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(
-  "DeliveryInfo",
-  DeliveryInfo
-);
 
 const userSchema = new Schema<IUser>({
   id: {
@@ -130,9 +131,9 @@ const userSchema = new Schema<IUser>({
     required: true,
   },
   role: {
-    type: String,
+    type: [String],
     required: true,
-    default: "USER",
+    default: ["USER"],
   },
   deliveryInfoList: {
     type: [
@@ -163,45 +164,8 @@ const userSchema = new Schema<IUser>({
     required: false,
     default: "Bronze",
   },
-  cart: {
-    type: [
-      {
-        id: {
-          type: String,
-          required: true,
-          unique: true,
-        },
-        userId: {
-          type: String,
-          required: true,
-        },
-        items: {
-          type: [
-            {
-              productId: String,
-              quantity: Number,
-            },
-          ],
-          required: true,
-        },
-        totalPrice: {
-          type: Number,
-          required: true,
-        },
-        shippingAddress: {
-          type: Schema.Types.ObjectId,
-          required: false,
-        },
-        updateAt: {
-          type: Date,
-          default: Date.now,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
+  cartId: {
+    type: String,
     required: false,
   },
   updateAt: {
