@@ -58,14 +58,14 @@ interface IUser extends Document {
 
   memberLevel: string;
 
-  cart?: Types.DocumentArray<ICart>;
-
   updateAt: Date;
 
   createdAt: Date;
 
+  idCart : String;
 }
 DeliveryInfo.plugin(passportLocalMongoose)
+
 const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(
   "DeliveryInfo",
   DeliveryInfo
@@ -164,46 +164,9 @@ const userSchema = new Schema<IUser>({
     required: false,
     default: "Bronze",
   },
-  cart: {
-    type: [
-      {
-        id: {
-          type: String,
-          required: true,
-          unique: true,
-        },
-        userId: {
-          type: String,
-          required: true,
-        },
-        items: {
-          type: [
-            {
-              productId: String,
-              quantity: Number,
-            },
-          ],
-          required: true,
-        },
-        totalPrice: {
-          type: Number,
-          required: true,
-        },
-        shippingAddress: {
-          type: Schema.Types.ObjectId,
-          required: false,
-        },
-        updateAt: {
-          type: Date,
-          default: Date.now,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-    required: false,
+  idCart:{
+    type: String,
+    required: true,
   },
   updateAt: {
     type: Date,

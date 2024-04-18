@@ -1,16 +1,24 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty,isNumber } from 'class-validator';
-import { LargeNumberLike } from 'crypto';
-
-
-export class CartDto{
-  @IsNotEmpty()
-  @MinLength(1, { message: "Số lượng sản phẩm không hợp lệ" })
-  public quantity: number;
-
-  public totalQuantity: number;
-  public pricePerProduct: number;
-  public totalPrice: number;
-  
+import { IsString, IsNotEmpty, IsOptional } from "class-validator";
+export class CartDto {
   @IsString()
-  public nameProduct: string;
+  id: string;
+
+  @IsNotEmpty()
+  userId: string;
+
+  @IsOptional()
+  @IsString()
+  items: string;
+
+  @IsOptional()
+  @IsString()
+  totalPrice: string;
+
+  @IsOptional()
+  @IsString()
+  shippingAddress?: string;
+
+  @IsOptional()
+  @IsString()
+  totalItemCount: string;
 }

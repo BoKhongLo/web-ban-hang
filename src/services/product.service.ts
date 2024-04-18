@@ -24,7 +24,6 @@ export async function addProductService(dto: addProductDto) {
           upperCaseAlphabets: false,
           specialChars: false,
         });
-
         idProduct = uuidv5(dto.productName + generatedOTP, uuidv5.URL);
       } else {
         break;

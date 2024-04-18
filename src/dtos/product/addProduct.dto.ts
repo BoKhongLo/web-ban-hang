@@ -4,9 +4,11 @@ export class addProductDto {
   @IsNotEmpty()
   @IsString()
   public productName: string;
+
   @IsString()
   @IsNotEmpty()
   public price: string;
+  
   @IsString()
   @IsNotEmpty()
   public cost: string;
