@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { CartModel, ICartItem, UserModel } from "../models";
+import { UserModel } from "../models";
 import jwt from "jsonwebtoken";
 import {LoginDto} from "dtos/auth/login.dto";
 import { CreateOtpDto, SignInDto, VerifyOtpDto } from "dtos/auth";
@@ -10,6 +10,7 @@ import { Types } from "mongoose";
 import { OtpModel } from "../models/OtpCode.model";
 import { sendMail } from "../config/mailer";
 import createId from "../utils/generater";
+import { createCartService } from "./cart.service";
 
 export async function loginService(dto: LoginDto) {
     try {
@@ -62,6 +63,7 @@ export async function signInService(dto: SignInDto) {
         user.firstName = dto.firstName;
         user.lastName = dto.lastName;
         user.address = dto.address ? dto.address : "NONE";
+        user.cartId = await createCartService(user.id);
         await user.save();
         return { data : {access_token, refresh_token}, status: 200 };
     } catch (error) {
@@ -140,8 +142,8 @@ export async function SendOptService(dto: CreateOtpDto) {
             if (userCheck) {
                 return { data : {error: "User is exist!"}, status: 401 };
             }
-            if ("BANNED" in userCheck.role) {
-                return { data : {error: "the user is banned!"}, status: 401 };
+            if (userCheck.role.includes("BANNED")) {
+                return { data: { error: "The user is banned!" }, status: 401 };
             }
             await sendMail(
                 dto.email, 
@@ -176,8 +178,8 @@ export async function VerifyOptService(dto: VerifyOtpDto) {
         if (userCheck) {
             return { data : {error: "The user is exist!"}, status: 401 };
         }
-        if ("BANNED" in userCheck.role) {
-            return { data : {error: "the user is banned!"}, status: 401 };
+        if (userCheck.role.includes("BANNED")) {
+            return { data: { error: "The user is banned!" }, status: 401 };
         }
         const optCheck = await OtpModel.findOne({ 
             email: dto.email, 
@@ -216,8 +218,8 @@ export async function RefreshTokenService(dto) {
         if (!userCheck) {
             return { data: { error: "User not found" }, status: 404 };
         }
-        if ("BANNED" in userCheck.role) {
-            return { data : {error: "the user is banned!"}, status: 401 };
+        if (userCheck.role.includes("BANNED")) {
+            return { data: { error: "The user is banned!" }, status: 401 };
         }
         const access_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5 });
         const refresh_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d' });

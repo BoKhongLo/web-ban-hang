@@ -9,7 +9,7 @@ export async function createCartService(userId: string) {
     cart.items = new Types.DocumentArray<ICartItem>([]);
     cart.shippingAddress = new Types.DocumentArray<IDeliveryInfo>([]);
     await cart.save();
-    return cart.toJSON() 
+    return cart.toJSON().id;
   }
   catch {
     return null
