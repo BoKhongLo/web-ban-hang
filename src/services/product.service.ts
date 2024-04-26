@@ -1,4 +1,9 @@
-import { addProductDto, deleteProductDto, editProductDto } from "../dtos/product";
+import {
+  addProductDto,
+  deleteProductDto,
+  editProductDto,
+  searchProductByContentDTO,
+} from "../dtos/product";
 import { ProducModel, UserModel } from "../models";
 import createId from "../utils/generater";
 import { Types } from "mongoose";
@@ -7,12 +12,17 @@ export async function addProductService(dto: addProductDto) {
   try {
     let userCheck = await UserModel.findOne({
       id: dto.userId,
-    })
+    });
     if (!userCheck) {
       return { data: { error: "User is exist!" }, status: 401 };
     }
 
-    if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("WEREHOUSEMANGER"))) {
+    if (
+      !(
+        userCheck.role.includes("ADMIN") ||
+        userCheck.role.includes("WEREHOUSEMANGER")
+      )
+    ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
     if (userCheck.role.includes("BANNED")) {
@@ -27,7 +37,7 @@ export async function addProductService(dto: addProductDto) {
     product.productType = dto.productType;
     product.pattern = new Types.Array<string>();
     if (dto.pattern) {
-      product.pattern.push(dto.pattern)
+      product.pattern.push(dto.pattern);
     }
     product.detail = dto.detail ? dto.detail : "NULL";
     product.isDisplay = true;
@@ -44,11 +54,16 @@ export async function deleteProductService(dto: deleteProductDto) {
   try {
     let userCheck = await UserModel.findOne({
       id: dto.userId,
-    })
+    });
     if (!userCheck) {
       return { data: { error: "User is exist!" }, status: 401 };
     }
-    if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("WEREHOUSEMANGER"))) {
+    if (
+      !(
+        userCheck.role.includes("ADMIN") ||
+        userCheck.role.includes("WEREHOUSEMANGER")
+      )
+    ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
     if (userCheck.role.includes("BANNED")) {
@@ -64,16 +79,20 @@ export async function deleteProductService(dto: deleteProductDto) {
   }
 }
 
-
 export async function editProductService(dto: editProductDto) {
   try {
     let userCheck = await UserModel.findOne({
       id: dto.userId,
-    })
+    });
     if (!userCheck) {
       return { data: { error: "User is exist!" }, status: 401 };
     }
-    if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("WEREHOUSEMANGER"))) {
+    if (
+      !(
+        userCheck.role.includes("ADMIN") ||
+        userCheck.role.includes("WEREHOUSEMANGER")
+      )
+    ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
     if (userCheck.role.includes("BANNED")) {
@@ -81,12 +100,20 @@ export async function editProductService(dto: editProductDto) {
     }
     const product = await ProducModel.findOne({ id: dto.id });
     product.isDisplay = dto.isDisplay ? dto.isDisplay : product.isDisplay;
-    product.productName = dto.productName ? dto.productName : product.productName;
-    product.description = dto.description ? dto.description : product.description;
+    product.productName = dto.productName
+      ? dto.productName
+      : product.productName;
+    product.description = dto.description
+      ? dto.description
+      : product.description;
     product.cost = dto.cost ? dto.cost : product.cost;
     product.price = dto.price ? dto.price : product.price;
-    product.stockQuantity = dto.stockQuantity ? dto.stockQuantity : product.stockQuantity;
-    product.productType = dto.productType ? dto.productType : product.productType;
+    product.stockQuantity = dto.stockQuantity
+      ? dto.stockQuantity
+      : product.stockQuantity;
+    product.productType = dto.productType
+      ? dto.productType
+      : product.productType;
     product.detail = dto.detail ? dto.detail : product.detail;
     product.updateAt = new Date();
 
@@ -96,4 +123,18 @@ export async function editProductService(dto: editProductDto) {
     console.error(error);
     return { data: { error: "edit product failed" }, status: 500 };
   }
-};
+}
+
+export async function searchProductByContentService(dto: searchProductByContentDTO) {
+  try {
+    const regex = new RegExp(dto.productName, "i");
+    let products = await ProducModel.find({ productName: regex }).select(
+      "productName description price stockQuantity productType pattern imgDisplay buyCount rating detail"
+    );
+
+    return { data: products, status: 200 };
+  } catch (error) {
+    console.error(error);
+    return { data: { error: "search product failed" }, status: 500 };
+  }
+}

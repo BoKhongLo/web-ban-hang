@@ -11,8 +11,9 @@ import {
 } from "../services/auth.service";
 import { CreateOtpDto, LoginDto, SignInDto, VerifyOtpDto } from "../dtos/auth";
 import { validate } from "class-validator";
+import { createCartService } from "../services/cart.service";
 
-const   signInController = async (req: Request, res: Response) => {
+const signInController = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -27,7 +28,6 @@ const   signInController = async (req: Request, res: Response) => {
   dto.address = req.body.address;
   dto.gender = req.body.gender;
   dto.otpId = req.body.otpId;
-
   validate(dto).then((errors) => {
     if (errors.length > 0) {
       res.status(500).json({ errors: errors });

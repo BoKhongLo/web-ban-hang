@@ -2,6 +2,7 @@ import {
   addProductDto,
   deleteProductDto,
   editProductDto,
+  searchProductByContentDTO,
 } from "../dtos/product";
 import { ProducModel } from "../models";
 import { validate } from "class-validator";
@@ -11,6 +12,7 @@ import {
   addProductService,
   deleteProductService,
   editProductService,
+  searchProductByContentService,
 } from "../services/product.service";
 
 const addProductController = async (req: Request, res: Response) => {
@@ -75,4 +77,15 @@ const editProductController = async (req: Request, res: Response) => {
   return res.status(returnData.status).json(returnData.data);
 };
 
-export { addProductController, deleteProductController, editProductController };
+const searchProductByContentController = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const dto = new searchProductByContentDTO();
+  dto.productName = req.body.productName;
+  const returnData = await searchProductByContentService(dto);
+  return res.status(returnData.status).json(returnData.data);
+}
+
+export { addProductController, deleteProductController, editProductController, searchProductByContentController };

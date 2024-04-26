@@ -37,8 +37,4 @@ export class SignInDto {
   @IsOptional()
   @IsString()
   public gender?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public idCart : string;
 }

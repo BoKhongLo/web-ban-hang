@@ -1,5 +1,5 @@
 import express from "express";
-import { addProductController, deleteProductController, editProductController } from "../controllers/product.controller";
+import { addProductController, deleteProductController, editProductController, searchProductByContentController } from "../controllers/product.controller";
 import passport from "passport";
 
 const routerProduct = express.Router();
@@ -17,5 +17,10 @@ routerProduct.post(
   "/editProduct",
   passport.authenticate("jwt", { session: false }),
   editProductController
+)
+routerProduct.get(
+  "/searchProductByProductType",
+  // passport.authenticate("jwt", { session: false }),
+  searchProductByContentController
 )
 export { routerProduct };

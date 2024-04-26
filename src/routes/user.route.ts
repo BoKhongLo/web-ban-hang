@@ -1,11 +1,11 @@
 import express from "express";
-import { getUserDetails, updateUserDetails } from "../controllers/users.controller";
+import { getUserByID, editUserByID } from "../controllers/users.controller";
 
 const routerUser = express.Router();
 
 routerUser.get("/", (req, res) => {
     res.send("GET users");
 });
-routerUser.get("/detail", getUserDetails);
-routerUser.post("/update", updateUserDetails);
+routerUser.get("/detail", getUserByID);
+routerUser.post("/update", editUserByID);
 export { routerUser };
