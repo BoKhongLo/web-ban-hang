@@ -64,8 +64,9 @@ export async function signInService(dto: SignInDto) {
         user.firstName = dto.firstName;
         user.lastName = dto.lastName;
         user.address = dto.address ? dto.address : "NONE";
-        user.cartId = await createCartService(user.id);
-        user.roomId = await createRoomService(user.id);
+        user.cartId = await createCartService(user.toJSON().id);
+        user.roomId = await createRoomService(user.toJSON().id);
+        console.log('cart id :',user.cartId);
         await user.save();
         return { data : {access_token, refresh_token}, status: 200 };
     } catch (error) {
@@ -154,7 +155,7 @@ export async function SendOptService(dto: CreateOtpDto) {
                 userCheck.username,
                 token,
                 'forgetPassword',
-             )
+            )
             return { data : {isRequest: true}, status: 200 };
         }
         else if (dto.type == "SignUp") {
@@ -164,7 +165,7 @@ export async function SendOptService(dto: CreateOtpDto) {
                 "",
                 token,
                 'createAccount',
-             )
+            )
             return { data : {isRequest: true}, status: 200 };
         }
         return { data : {isRequest: false}, status: 401 };

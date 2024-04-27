@@ -14,7 +14,7 @@ const getUserByIdController = async (req : Request, res : Response) => {
     return res.status(returnData.status).json(returnData.data);
 };
 
-const updateUserDetails = async (req : Request, res : Response) => {
+const editUserById = async (req : Request, res : Response) => {
 
 };
 
@@ -24,6 +24,6 @@ const getOrderHistory = async (req : Request, res : Response) => {
 
 export {
     getUserByIdController,
-    updateUserDetails,
+    editUserById,
     getOrderHistory,
 };
