@@ -1,6 +1,5 @@
 import express, { Express } from "express";
 import morgan from "morgan";
-import { engine } from "express-handlebars";
 import * as dotenv from "dotenv";
 import bodyParser from "body-parser";
 import { connectDb } from "./config/database.ts";
@@ -12,7 +11,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 import { roomHandler } from "./config/websocket.ts";
 import "./config/mailer.ts";
-import multer from "multer";
+
 import {
   routerAuth,
   routerMedia,
@@ -30,16 +29,26 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:4200",
+    origin: ["http://localhost:3000", "http://localhost:3434"],
     methods: ["GET", "POST"],
+    credentials: true
   },
 });
 
 app.use(express.json());
 
+const whitelist = ["http://localhost:3000", "http://localhost:3434"];
 const corsOptions = {
-    origin: ["http://localhost:4200", "http://localhost:3000" ],
-}
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (whitelist.indexOf(origin!) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST"],
+  credentials: true
+};
 
 app.use(cors(corsOptions));
 

@@ -5,6 +5,7 @@ import { addMessageService } from "../services/rooomchat.service";
 export const roomHandler = (socket: Socket) => {
     const joinRoom = ({ roomId }) => {
         socket.join(roomId);
+        console.log(`Joined ${roomId}`);
         socket.on("disconnect", () => {
             console.log("user left the room");
         });

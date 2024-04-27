@@ -11,6 +11,7 @@ import { OtpModel } from "../models/OtpCode.model";
 import { sendMail } from "../config/mailer";
 import createId from "../utils/generater";
 import { createCartService } from "./cart.service";
+import { createRoomService } from "./rooomchat.service";
 
 export async function loginService(dto: LoginDto) {
     try {
@@ -64,6 +65,7 @@ export async function signInService(dto: SignInDto) {
         user.lastName = dto.lastName;
         user.address = dto.address ? dto.address : "NONE";
         user.cartId = await createCartService(user.id);
+        user.roomId = await createRoomService(user.id);
         await user.save();
         return { data : {access_token, refresh_token}, status: 200 };
     } catch (error) {
@@ -123,6 +125,7 @@ export async function SendOptService(dto: CreateOtpDto) {
             optCheck.otpCode = token;
             optCheck.id = idOtp
             optCheck.value = false;
+            optCheck.isDisplay = true;
             await optCheck.save()
         }
         else {
@@ -142,7 +145,7 @@ export async function SendOptService(dto: CreateOtpDto) {
             if (userCheck) {
                 return { data : {error: "User is exist!"}, status: 401 };
             }
-            if (userCheck.role.includes("BANNED")) {
+            if (userCheck && userCheck.role.includes("BANNED")) {
                 return { data: { error: "The user is banned!" }, status: 401 };
             }
             await sendMail(
@@ -171,14 +174,10 @@ export async function SendOptService(dto: CreateOtpDto) {
     }
 }
 
-
 export async function VerifyOptService(dto: VerifyOtpDto) {
     try {
         const userCheck = await UserModel.findOne({ email: dto.email });
-        if (userCheck) {
-            return { data : {error: "The user is exist!"}, status: 401 };
-        }
-        if (userCheck.role.includes("BANNED")) {
+        if (userCheck && userCheck.role.includes("BANNED")) {
             return { data: { error: "The user is banned!" }, status: 401 };
         }
         const optCheck = await OtpModel.findOne({ 
@@ -194,7 +193,7 @@ export async function VerifyOptService(dto: VerifyOtpDto) {
         optCheck.value = true;
         optCheck.isDisplay = false;
         await optCheck.save();
-        return { data : {optId: optCheck.id, value: optCheck.value}, status: 200 };
+        return { data : {otpId: optCheck.id, value: optCheck.value}, status: 200 };
     } catch (error) {
         console.error(error);
         return { data : { error: "Verify Otp failed" }, status: 500 };

@@ -31,6 +31,10 @@ export async function getAllRoomService(adminId: string) {
 
 export async function createRoomService(userId: string) {
     try {
+        let checkRoom = await roomchatModel.findOne({ userId: userId})
+        if (checkRoom) {
+            return checkRoom.toJSON().id
+        }
         let newRoom = new roomchatModel();
         newRoom.id = await createId(userId, roomchatModel);
         newRoom.updateAt = new Date();
@@ -40,10 +44,10 @@ export async function createRoomService(userId: string) {
         newRoom.isBlock = false;
         newRoom.isDisplay = true;
         await newRoom.save();
-        return newRoom.toJSON();
+        return newRoom.toJSON().id;
     } catch (error) {
         console.error(error);
-        return { data : { error: "Login failed" }, status: 500 };
+        return null;
     }
 }
 

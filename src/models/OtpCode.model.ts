@@ -19,8 +19,7 @@ const otpSchema = new Schema<IOtp>({
     },
     email: {
         type: String,
-        required: true,
-        unique: true,  
+        required: true, 
     },
     otpCode: {
         type: String,

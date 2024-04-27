@@ -66,6 +66,8 @@ interface IUser extends Document {
 
   cartId: string;
 
+  roomId: string;
+
   updateAt: Date;
 
   createdAt: Date;
@@ -167,6 +169,10 @@ const userSchema = new Schema<IUser>({
     default: "Bronze",
   },
   cartId: {
+    type: String,
+    required: false,
+  },
+  roomId: {
     type: String,
     required: false,
   },

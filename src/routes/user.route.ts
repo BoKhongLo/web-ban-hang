@@ -1,11 +1,9 @@
 import express from "express";
-import { getUserDetails, updateUserDetails } from "../controllers/users.controller";
+import { getUserByIdController, updateUserDetails } from "../controllers/users.controller";
+import passport from "passport";
 
 const routerUser = express.Router();
 
-routerUser.get("/", (req, res) => {
-    res.send("GET users");
-});
-routerUser.get("/detail", getUserDetails);
+routerUser.get("/detail/:slug", passport.authenticate("jwt", { session: false }),getUserByIdController);
 routerUser.post("/update", updateUserDetails);
 export { routerUser };
