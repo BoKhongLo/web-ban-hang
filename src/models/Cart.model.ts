@@ -2,16 +2,6 @@ import mongoose, { Schema, Types, Model, Document } from "mongoose";
 import { IDeliveryInfo, DeliveryInfoModel } from "./Users.model";
 import passportLocalMongoose from "passport-local-mongoose";
 
-// const cartItemSchema = new Schema<ICartItem>({
-//   productId: {
-//     type: String,
-//     required: true,
-//   },
-//   quantity:{
-//     type: String,
-//     required: true,
-//   }
-// })
 interface ICartItem {
   productId: string;
   quantity: number;
