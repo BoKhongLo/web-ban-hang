@@ -2,19 +2,19 @@ import { IsString, IsNotEmpty, IsOptional,IsBoolean, IsDate, IsNumber } from "cl
 export class editProductDto {
   @IsNotEmpty()
   @IsString()
-  public id: string;
-  
-  @IsNotEmpty()
+  public productId: string;
+
+  @IsOptional()
   @IsString()
-  public userId: string;
+  public userId?: string;
 
   @IsString()
   @IsOptional()
-  public productName: string;
+  public productName?: string;
 
   @IsBoolean()
   @IsOptional()
-  public isDisplay: boolean;
+  public isDisplay?: boolean;
 
   @IsString()
   @IsOptional()
@@ -22,29 +22,25 @@ export class editProductDto {
 
   @IsNumber()
   @IsOptional()
-  public price: number;
+  public price?: number;
   
   @IsNumber()
   @IsOptional()
-  public cost: number;
+  public cost?: number;
 
   @IsNumber()
   @IsOptional()
-  public stockQuantity: number;
+  public stockQuantity?: number;
 
   @IsString()
   @IsOptional()
-  public productType: string;
+  public productType?: string;
 
   @IsString()
   @IsOptional()
-  public pattern: string[];
+  public pattern?: string[];
 
   @IsString()
   @IsOptional()
-  public detail: string;
-
-  @IsDate()
-  @IsOptional()
-  public updateAt: Date
+  public detail?: string;
 }

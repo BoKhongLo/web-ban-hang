@@ -5,9 +5,9 @@ export class addProductDto {
   @IsString()
   public productName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  public userId: string;
+  public userId?: string;
 
   @IsNumber()
   @IsNotEmpty()

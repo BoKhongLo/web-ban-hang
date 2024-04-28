@@ -25,9 +25,7 @@ export async function addProductService(dto: addProductDto) {
     ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
-    if (userCheck.role.includes("BANNED")) {
-      return { data: { error: "the user is banned!" }, status: 401 };
-    }
+
     const product = new ProducModel();
     product.id = await createId(dto.productName, ProducModel);
     product.productName = dto.productName;
@@ -66,10 +64,8 @@ export async function deleteProductService(dto: deleteProductDto) {
     ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
-    if (userCheck.role.includes("BANNED")) {
-      return { data: { error: "the user is banned!" }, status: 401 };
-    }
-    const product = await ProducModel.findOne({ id: dto.id });
+
+    const product = await ProducModel.findOne({ id: dto.productId });
     product.isDisplay = false;
     await product.save();
     return { data: { isRequest: true }, status: 200 };
@@ -95,10 +91,8 @@ export async function editProductService(dto: editProductDto) {
     ) {
       return { data: { error: "The user is not permission" }, status: 401 };
     }
-    if (userCheck.role.includes("BANNED")) {
-      return { data: { error: "the user is banned!" }, status: 401 };
-    }
-    const product = await ProducModel.findOne({ id: dto.id });
+
+    const product = await ProducModel.findOne({ id: dto.productId });
     product.isDisplay = dto.isDisplay ? dto.isDisplay : product.isDisplay;
     product.productName = dto.productName
       ? dto.productName

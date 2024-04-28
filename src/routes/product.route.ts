@@ -4,23 +4,24 @@ import passport from "passport";
 
 const routerProduct = express.Router();
 routerProduct.post(
-  "/addProduct",
-  // passport.authenticate("jwt", { session: false }),
+  "/add",
+  passport.authenticate("jwt", { session: false }),
   addProductController
 );
 routerProduct.post(
-  "/deleteProduct",
+  "/delete",
   passport.authenticate("jwt", { session: false }),
   deleteProductController
 )
 routerProduct.post(
-  "/editProduct",
+  "/edit",
   passport.authenticate("jwt", { session: false }),
   editProductController
 )
+
 routerProduct.get(
-  "/searchProductByProductType",
-  // passport.authenticate("jwt", { session: false }),
+  "/search:slug",
+  passport.authenticate("jwt", { session: false }),
   searchProductByContentController
 )
 export { routerProduct };

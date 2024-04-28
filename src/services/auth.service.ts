@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { UserModel } from "../models";
 import jwt from "jsonwebtoken";
 import {LoginDto} from "dtos/auth/login.dto";
-import { CreateOtpDto, SignInDto, VerifyOtpDto } from "dtos/auth";
+import { CreateOtpDto, SignUpDto, VerifyOtpDto } from "dtos/auth";
 import { v5 as uuidv5 } from 'uuid';
 import * as OTPAuth from "otpauth";
 import * as otpGenerator from 'otp-generator';
@@ -25,7 +25,7 @@ export async function loginService(dto: LoginDto) {
         if ("BANNED" in user.role) {
             return { data : {error: "the user is banned!"}, status: 401 };
         }
-        const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5});
+        const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: "1h"});
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
         user.refresh_token = refresh_token
         await user.save();
@@ -36,7 +36,7 @@ export async function loginService(dto: LoginDto) {
     }
 }
 
-export async function signInService(dto: SignInDto) {
+export async function signUpService(dto: SignUpDto) {
     try {
         const userCheck = await UserModel.findOne({ email: dto.email });
         if (userCheck) {
@@ -51,7 +51,7 @@ export async function signInService(dto: SignInDto) {
         const user = new UserModel();
         user.id = await createId(dto.email, UserModel);
         const refresh_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d'});
-        const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5});
+        const access_token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: "1h"});
         const hashedPassword = await bcrypt.hash(dto.password, 10);
         user.hash = hashedPassword;
         user.email = dto.email;
@@ -202,7 +202,7 @@ export async function VerifyOptService(dto: VerifyOtpDto) {
 }
 
 
-export async function RefreshTokenService(dto) {
+export async function RefreshTokenService(dto : string) {
     try {
         const token : any = await new Promise((resolve, reject) => {
             jwt.verify(dto, process.env.JWT_SECRET_KEY_REFRESH, (err, decoded) => {
@@ -221,7 +221,7 @@ export async function RefreshTokenService(dto) {
         if (userCheck.role.includes("BANNED")) {
             return { data: { error: "The user is banned!" }, status: 401 };
         }
-        const access_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: 60 * 5 });
+        const access_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_ACCESS, { expiresIn: "1h" });
         const refresh_token = jwt.sign({ id: token.id }, process.env.JWT_SECRET_KEY_REFRESH, { expiresIn: '15d' });
         
         userCheck.refresh_token = refresh_token;

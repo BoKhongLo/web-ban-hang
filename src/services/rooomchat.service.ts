@@ -13,10 +13,7 @@ export async function getAllRoomService(adminId: string) {
         }
         if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("TELESALES"))) {
             return { data: { error: "The user is not permission" }, status: 401 };
-          }
-        if (userCheck.role.includes("BANNED")) {
-            return { data: { error: "the user is banned!" }, status: 401 };
-          }
+        }
         let allRoom = await roomchatModel.find();
         let dataReturn = [];
         allRoom.map((value, index) => {
@@ -37,8 +34,6 @@ export async function createRoomService(userId: string) {
         }
         let newRoom = new roomchatModel();
         newRoom.id = await createId(userId, roomchatModel);
-        newRoom.updateAt = new Date();
-        newRoom.createdAt = new Date();
         newRoom.userId = userId;
         newRoom.messages = new Types.DocumentArray<IMessages>([]);
         newRoom.isBlock = false;
@@ -57,29 +52,26 @@ export async function addMessageService(megs: IMessages) {
             id: megs.userId,
         })
         if (!userCheck) {
+            console.log("wrong user")
             return null;
         }
-        if (userCheck.role.includes("BANNED")) {
-            return null;
-        }
-
         let roomUser = await roomchatModel.findOne({
             id: megs.roomId,
         });
         if (!roomUser) {
+            console.log("wrong room")
             return null;
         }
 
-        if (roomUser.isDisplay == false || roomUser.isBlock == false) {
+        if (roomUser.isDisplay == false || roomUser.isBlock == true) {
             return null;
         }
 
         if (roomUser.userId !== megs.userId) {
-            if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("WEREHOUSEMANGER"))) {
+            if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("TELESALES"))) {
                 return null;
             }
         }
-
         let newMessage = new MessagesModel();
         newMessage.id = uuidv5(megs.content + roomUser.messages.length, uuidv5.URL);
         newMessage.content = megs.content;
@@ -96,19 +88,19 @@ export async function addMessageService(megs: IMessages) {
     }
 }
 
-export async function getRoomByIdService(userId: string) {
+export async function getRoomByIdService(adminId: string, roomId: string){
     try {
         let userCheck = await UserModel.findOne({
-            id: userId,
+            id: adminId,
         })
         if (!userCheck) {
-            return { data : {error: "User is exist!"}, status: 401 };
+            return { data : {error: "The user is exist!"}, status: 401 };
         }
-        if (userCheck.role.includes("BANNED")) {
-            return { data: { error: "the user is banned!" }, status: 401 };
-          }
+        if (!(userCheck.role.includes("ADMIN") || userCheck.role.includes("TELESALES"))) {
+            return { data: { error: "The user is not permission" }, status: 401 };
+        }
         let roomUser = await roomchatModel.findOne({
-            userId: userId,
+            id: roomId
         });
         if (!roomUser) {
             return { data : {error: "This room is exist!"}, status: 401 };

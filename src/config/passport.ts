@@ -15,12 +15,7 @@ passport.use(
             if (!user) {
                 return done(undefined, false, { message: `username ${username} not found.` });
             }
-            
-            // if (isMatch) {
-            //     return done(undefined, user);
-            // } else {
-            //     return done(undefined, false, { message: 'Invalid username or password.' });
-            // }
+        
         } catch (err) {
             return done(err);
         }
@@ -36,8 +31,11 @@ passport.use(
         async function (jwtToken, done) {
             try {
                 const user = await UserModel.findOne({ id: jwtToken.id });
+                if (user.role.includes("BANNED")) {
+                    return done(undefined, false, { message: `username was banned.` });
+                }
                 if (user) {
-                    return done(undefined, user, jwtToken);
+                    return done(undefined, user.toJSON(), jwtToken);
                 } else {
                     return done(undefined, false);
                 }
@@ -48,23 +46,3 @@ passport.use(
     )
 );
 
-passport.use(
-    new JwtStrategy(
-        {
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: "super-secret",
-        },
-        async function (jwtToken, done) {
-            try {
-                const user = await UserModel.findOne({ id: jwtToken.id });
-                if (user) {
-                    return done(undefined, user, jwtToken);
-                } else {
-                    return done(undefined, false);
-                }
-            } catch (err) {
-                return done(err, false);
-            }
-        }
-    )
-);

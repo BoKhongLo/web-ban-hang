@@ -7,18 +7,18 @@ import {
   SendOptService,
   VerifyOptService,
   loginService,
-  signInService,
+  signUpService,
 } from "../services/auth.service";
-import { CreateOtpDto, LoginDto, SignInDto, VerifyOtpDto } from "../dtos/auth";
+import { CreateOtpDto, LoginDto, SignUpDto, VerifyOtpDto } from "../dtos/auth";
 import { validate } from "class-validator";
 import { createCartService } from "../services/cart.service";
 
-const signInController = async (req: Request, res: Response) => {
+const signUpController = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const dto = new SignInDto();
+  const dto = new SignUpDto();
   dto.email = req.body.email;
   dto.password = req.body.password;
   dto.phoneNumber = req.body.phoneNumber;
@@ -33,7 +33,7 @@ const signInController = async (req: Request, res: Response) => {
       res.status(500).json({ errors: errors });
     }
   });
-  const returnData = await signInService(dto);
+  const returnData = await signUpService(dto);
   return res.status(returnData.status).json(returnData.data);
 };
 
@@ -184,7 +184,7 @@ const sendOtpController = async (req: Request, res: Response) => {
 // };
 
 export {
-  signInController,
+  signUpController,
   loginController,
   verifyOtpController,
   sendOtpController,

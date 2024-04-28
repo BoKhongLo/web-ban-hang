@@ -15,7 +15,7 @@ const getUserByIdController = async (req : Request, res : Response) => {
 };
 
 const editUserById = async (req : Request, res : Response) => {
-
+  return res.json(req.user);
 };
 
 const getOrderHistory = async (req : Request, res : Response) => {

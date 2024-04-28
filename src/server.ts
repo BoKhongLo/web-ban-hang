@@ -18,6 +18,7 @@ import {
   routerProduct,
   routerUser,
   routerCart,
+  routerRoomchat,
 } from "./routes";
 
 dotenv.config();
@@ -81,13 +82,16 @@ app.use(
   passport.authenticate("jwt", { session: false }),
   routerUser
 );
+
 app.use("/auth", routerAuth);
 app.use("/media", routerMedia);
 app.use("/product", routerProduct);
 app.use("/cart", routerCart);
+app.use("/roomchat", routerRoomchat);
+
 io.on("connection", (socket) => {
   console.log("a user connected");
-  roomHandler(socket);
+  roomHandler(socket , io);
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });

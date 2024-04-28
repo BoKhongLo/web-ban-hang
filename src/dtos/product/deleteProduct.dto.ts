@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty,IsOptional } from "class-validator";
 export class deleteProductDto {
   @IsNotEmpty()
   @IsString()
-  public id : string;
+  public productId : string;
 
   @IsString()
   @IsOptional()

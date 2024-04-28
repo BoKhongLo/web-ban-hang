@@ -46,8 +46,8 @@ const deleteProductController = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const dto = new deleteProductDto();
-  dto.id = req.body.id;
-  dto.userId = req.body.userId;
+  dto.productId = req.body.productId;
+  dto.userId = req.user['id'];
   validate(dto).then((errors) => {
     if (errors.length > 0) {
       res.status(500).json({ errors: errors });
@@ -63,7 +63,7 @@ const editProductController = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const dto = new editProductDto();
-  dto.userId = req.body.userId;
+  dto.userId = req.user['id'];
   dto.productName = req.body.productName;
   dto.cost = req.body.cost;
   dto.isDisplay = req.body.isDisplay;
@@ -83,7 +83,7 @@ const searchProductByContentController = async (req: Request, res: Response) => 
     return res.status(400).json({ errors: errors.array() });
   }
   const dto = new searchProductByContentDTO();
-  dto.productName = req.body.productName;
+  dto.productName = req.params.slug;
   const returnData = await searchProductByContentService(dto);
   return res.status(returnData.status).json(returnData.data);
 }
