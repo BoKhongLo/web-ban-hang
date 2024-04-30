@@ -13,6 +13,7 @@ interface IMessages extends Document {
   updateAt?: Date;
   createdAt?: Date;
 }
+
 const messagesSchema = new Schema<IMessages>({
   id: {
     type: String,
@@ -34,9 +35,18 @@ const messagesSchema = new Schema<IMessages>({
     type: String,
     required: false,
   },
-  content: { type: String, required: true },
-  urlFile: { type: [String] , required: false },
-  star: { type: Number, required: false },
+  content: { 
+    type: String, 
+    required: true 
+  },
+  urlFile: { 
+    type: [String], 
+    required: false 
+  },
+  star: { 
+    type: Number, 
+    required: false 
+  },
   updateAt: {
     type: Date,
     default: Date.now,
@@ -55,10 +65,21 @@ const MessagesModel: Model<IMessages> = mongoose.model<IMessages>(
   messagesSchema
 );
 
-interface ISales extends Document {
+interface IImage {
+  url: string;
+  link?: string[];
+}
+
+interface ISales {
   isSales: boolean;
   percents: number;
   end: Date;
+}
+
+interface IDetail {
+  tags: Types.Array<string>;
+  company: string;
+  materials: Types.Array<string>;
 }
 
 interface IProduct extends Document {
@@ -67,30 +88,32 @@ interface IProduct extends Document {
   productName: string;
 
   isDisplay: boolean;
-
-  description?: string;
-
+  
   cost: number;
 
   price: number;
 
   stockQuantity: number;
 
-  imgDisplay: Types.Array<string>;
+  imgDisplay: Types.DocumentArray<IImage>;
 
   productType: string;
 
-  pattern: Types.Array<string>;
+  color: Types.Array<string>;
+
+  size: Types.Array<string>;
 
   buyCount?: number;
 
   rating?: number;
 
-  commentsList: Types.DocumentArray<IMessages>;
+  commentsList?: Types.DocumentArray<IMessages>;
 
-  detail: string;
+  detail?: IDetail;
 
   sales?: ISales;
+
+  description?: string;
 
   updateAt: Date,
 
@@ -106,37 +129,56 @@ const productSchema = new Schema<IProduct>({
   productName: {
     type: String,
     required: true,
-    validate: {
-      validator: (value: string) => value.length > 3,
-      message: "Tên người dùng phải có nhiều hơn 3 kí tự.",
-    },
   },
   isDisplay: {
     type: Boolean,
     required: true,
     default: true,
   },
-  description: {
-    type: String,
-    required: false,
-    default: "Sản phẩm với chất liệu mềm mại, siêu thấm hút mồ hôi, ........",
+  cost: {
+    type:
+      Number,
+    required: true
   },
-  cost: { type: Number, required: true },
-  price: { type: Number, required: true },
-  stockQuantity: { type: Number, required: true },
+  price: {
+    type: Number,
+    required: true
+  },
+  stockQuantity: {
+    type: Number,
+    required: true
+  },
   productType: {
     type: String,
     main: String,
     sub: String,
     required: true,
   },
-  pattern: {
+
+  color: {
     type: [String],
     required: false,
+    default: ["All"]
+  },
+  size: {
+    type: [String],
+    required: false,
+    default: ["All"]
   },
   imgDisplay: {
-    type: [String],
+    type: [{
+      url: {
+        type: String,
+        required: true,
+      },
+      link: {
+        type: [String],
+        required: false,
+        default: []
+      }
+    }],
     required: false,
+    default: []
   },
   buyCount: {
     type: Number,
@@ -149,11 +191,12 @@ const productSchema = new Schema<IProduct>({
     default: 5,
   },
   detail: {
-    type: String,
-    required: true,
-    tags: { type: [String], required: false },
-    labels: { type: String, required: false, default: "Shiro" },
-    materials: { type: [String], required: true },
+    type: {
+      tags: { type: [String], required: false, default: ["All"] },
+      company: { type: String, required: false, default: "Unknown" },
+      materials: { type: [String], required: true, default: [] },
+    },
+    required: false,
   },
   sales: {
     type: {
@@ -200,7 +243,7 @@ const productSchema = new Schema<IProduct>({
           required: false,
         },
         content: { type: String, required: true },
-        urlFile: { type: [String] , required: false },
+        urlFile: { type: [String], required: false },
         star: { type: Number, required: false },
         updateAt: {
           type: Date,
@@ -214,6 +257,12 @@ const productSchema = new Schema<IProduct>({
         },
       },
     ],
+    required: false,
+  },
+  description: { 
+    type: String, 
+    required: false, 
+    default: "" 
   },
   updateAt: {
     type: Date,
@@ -228,4 +277,4 @@ const ProducModel: Model<IProduct> = mongoose.model<IProduct>(
   "Product",
   productSchema
 );
-export { ProducModel, IProduct, IMessages, MessagesModel };
+export { ProducModel, IProduct, IMessages, MessagesModel, IDetail, IImage };

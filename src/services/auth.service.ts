@@ -58,8 +58,7 @@ export async function signUpService(dto: SignUpDto) {
         user.isDisplay = true;
         user.refresh_token = refresh_token;
         user.username = dto.username;
-        user.phoneNumber = new Types.Array<string>();
-        user.phoneNumber.push(dto.phoneNumber)
+        user.phoneNumber = dto.phoneNumber;
         user.gender = dto.gender  ? dto.gender : "OTHER";
         user.firstName = dto.firstName;
         user.lastName = dto.lastName;

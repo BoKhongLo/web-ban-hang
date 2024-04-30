@@ -4,7 +4,7 @@ import {
   editProductDto,
   searchProductByContentDTO,
 } from "../dtos/product";
-import { ProducModel, UserModel } from "../models";
+import { IDetail, IImage, ProducModel, UserModel } from "../models";
 import createId from "../utils/generater";
 import { Types } from "mongoose";
 
@@ -13,8 +13,9 @@ export async function addProductService(dto: addProductDto) {
     let userCheck = await UserModel.findOne({
       id: dto.userId,
     });
+    console.log(dto.userId);
     if (!userCheck) {
-      return { data: { error: "User is exist!" }, status: 401 };
+      return { data: { error: "User is not exist!" }, status: 401 };
     }
 
     if (
@@ -29,17 +30,26 @@ export async function addProductService(dto: addProductDto) {
     const product = new ProducModel();
     product.id = await createId(dto.productName, ProducModel);
     product.productName = dto.productName;
-    product.description = dto.description;
+    product.description = dto.description ? dto.description : "";
     product.cost = dto.cost;
     product.price = dto.price;
     product.productType = dto.productType;
-    product.pattern = new Types.Array<string>();
-    if (dto.pattern) {
-      product.pattern.push(dto.pattern);
+    if (dto.color.length > 0) {
+      product.color = new Types.Array<string>();
+      product.color.push(...dto.color);
     }
-    product.detail = dto.detail ? dto.detail : "NULL";
+    if (dto.size.length > 0) {
+      product.size = new Types.Array<string>();
+      product.size.push(...dto.size);
+    }
+    if (dto.detail) {
+      product.detail = dto.detail;
+    }
+    if (dto.imgDisplay) {
+      product.imgDisplay = new Types.DocumentArray<IImage>(dto.imgDisplay);
+    }
     product.isDisplay = true;
-    product.stockQuantity = dto.stockQuantity ? dto.stockQuantity : 1000;
+    product.stockQuantity = dto.stockQuantity ? dto.stockQuantity : 0;
 
     await product.save();
     return { data: { ...product.toJSON() }, status: 200 };
@@ -81,7 +91,7 @@ export async function editProductService(dto: editProductDto) {
       id: dto.userId,
     });
     if (!userCheck) {
-      return { data: { error: "User is exist!" }, status: 401 };
+      return { data: { error: "User is not exist!" }, status: 401 };
     }
     if (
       !(
@@ -109,6 +119,17 @@ export async function editProductService(dto: editProductDto) {
       ? dto.productType
       : product.productType;
     product.detail = dto.detail ? dto.detail : product.detail;
+    product.imgDisplay = dto.imgDisplay
+      ? new Types.DocumentArray<IImage>(dto.imgDisplay)
+      : product.imgDisplay;
+    if (dto.color.length > 0) {
+      product.color = new Types.Array<string>();
+      product.color.push(...dto.color);
+    }
+    if (dto.size.length > 0) {
+      product.size = new Types.Array<string>();
+      product.size.push(...dto.size);
+    }
     product.updateAt = new Date();
 
     await product.save();
@@ -119,6 +140,35 @@ export async function editProductService(dto: editProductDto) {
   }
 }
 
+export async function getProductByIdService(productId: string) {
+  try {
+    let productCheck = await ProducModel.findOne({
+      id: productId,
+      isDisplay: true
+    });
+    if (!productCheck) {
+      return { data: { error: "This product is not exist!" }, status: 401 };
+    }
+    return { data: productCheck.toJSON(), status: 201 }
+  } catch (error) {
+    console.error(error);
+    return { data: { error: "Get product failed" }, status: 500 };
+  }
+}
+
+export async function getAllProductService() {
+  try {
+    let productList = await ProducModel.find({isDisplay: true});
+    let dataReturn = [];
+    productList.map((value, index) => {
+      dataReturn.push(value.toJSON())
+    })
+    return { data: dataReturn, status: 201 }
+  } catch (error) {
+    console.error(error);
+    return { data: { error: "Get product failed" }, status: 500 };
+  }
+}
 export async function searchProductByContentService(dto: searchProductByContentDTO) {
   try {
     const regex = new RegExp(dto.productName, "i");

@@ -31,7 +31,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:3000", "http://localhost:3434"],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
     credentials: true
   },
 });
@@ -47,7 +47,7 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   credentials: true
 };
 
@@ -66,10 +66,10 @@ app.use(
   })
 );
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: "50mb"}));
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}))
 
 
 app.use(morgan("combined"));

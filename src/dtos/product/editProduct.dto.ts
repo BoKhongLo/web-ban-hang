@@ -1,4 +1,6 @@
 import { IsString, IsNotEmpty, IsOptional,IsBoolean, IsDate, IsNumber } from "class-validator";
+import { IDetail, IImage } from "models";
+
 export class editProductDto {
   @IsNotEmpty()
   @IsString()
@@ -36,11 +38,16 @@ export class editProductDto {
   @IsOptional()
   public productType?: string;
 
-  @IsString()
   @IsOptional()
-  public pattern?: string[];
+  public color?: string[];
 
-  @IsString()
   @IsOptional()
-  public detail?: string;
+  public size?: string[];
+
+  @IsOptional()
+  public detail?: IDetail;
+
+  @IsOptional()
+  public imgDisplay?: IImage[];
+
 }

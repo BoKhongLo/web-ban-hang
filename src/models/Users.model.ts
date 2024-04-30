@@ -1,7 +1,6 @@
 import mongoose, { Schema, Model, Types, Document} from "mongoose";
-import passportLocalMongoose from "passport-local-mongoose";
 
-interface IDeliveryInfo  extends Document{
+interface IDeliveryInfo extends Document{
   name: string;
   phoneNumber: string;
   address: string;
@@ -21,8 +20,6 @@ const DeliveryInfo = new Schema<IDeliveryInfo>({
     required: true,
   },
 });
-
-DeliveryInfo.plugin(passportLocalMongoose)
 
 const DeliveryInfoModel: Model<IDeliveryInfo> = mongoose.model<IDeliveryInfo>(
   "DeliveryInfo",
@@ -46,7 +43,7 @@ interface IUser extends Document {
 
   email: string;
 
-  phoneNumber?: Types.Array<string>;
+  phoneNumber?: string;
 
   imgDisplay: Types.Array<string>;
 
@@ -58,9 +55,7 @@ interface IUser extends Document {
 
   role: Types.Array<string>;
 
-  deliveryInfoList?: Types.DocumentArray<IDeliveryInfo>;
-
-  isAuthenticated: boolean;
+  memberExp: number;
 
   memberLevel: string;
 
@@ -115,8 +110,9 @@ const userSchema = new Schema<IUser>({
     unique: true,
   },
   phoneNumber: {
-    type: [String],
-    required: true,
+    type: String,
+    required: false,
+    default: "",
   },
   imgDisplay: {
     type: [String],
@@ -139,29 +135,10 @@ const userSchema = new Schema<IUser>({
     required: true,
     default: ["USER"],
   },
-  deliveryInfoList: {
-    type: [
-      {
-        name: {
-          type: String,
-          required: true,
-        },
-        phoneNumber: {
-          type: String,
-          required: true,
-        },
-        address: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
+  memberExp: {
+    type: Number,
     required: false,
-  },
-  isAuthenticated: {
-    type: Boolean,
-    required: false,
-    default: false,
+    default: 0,
   },
   memberLevel: {
     type: String,
@@ -186,7 +163,7 @@ const userSchema = new Schema<IUser>({
     required: true, 
     default: Date.now,
   },
-} );
-userSchema.plugin(passportLocalMongoose)
+});
+
 const UserModel: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 export { UserModel, IUser, IDeliveryInfo, DeliveryInfoModel };
