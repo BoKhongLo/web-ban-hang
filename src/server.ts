@@ -36,9 +36,9 @@ const io = new Server(httpServer, {
   },
 });
 
-app.use(express.json());
 
-const whitelist = ["http://localhost:3000", "http://localhost:3434"];
+
+const whitelist = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3434"];
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (whitelist.indexOf(origin!) !== -1 || !origin) {
@@ -65,11 +65,16 @@ app.use(
     },
   })
 );
+
+app.use(express.json({ limit: '256mb' }))
+
+app.use(express.urlencoded({ limit: '256mb', extended: false, parameterLimit: 256000 }))
+
 // parse application/json
-app.use(bodyParser.json({limit: "50mb"}));
+app.use(bodyParser.json({limit: "256mb"}));
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}))
+app.use(bodyParser.urlencoded({limit: "256mb", extended: true, parameterLimit: 256000}))
 
 
 app.use(morgan("combined"));
